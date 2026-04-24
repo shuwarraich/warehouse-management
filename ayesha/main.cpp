@@ -1,9 +1,17 @@
 #include <iostream>
+#include <string>
 using namespace std;
 
 void clearInputBuffer() {
     cin.clear();
     cin.ignore(1000, '\n');
+}
+
+string getStringInput(string prompt) {
+    cout << prompt;
+    string input;
+    getline(cin, input);
+    return input;
 }
 
 class Person {
@@ -213,14 +221,11 @@ public:
             string name, contact, email, addr;
             cout << "Enter new Customer ID: ";
             cin >> cid;
-            cout << "Enter new Name: ";
-            cin >> name;
-            cout << "Enter new Contact: ";
-            cin >> contact;
-            cout << "Enter new Email: ";
-            cin >> email;
-            cout << "Enter new Address: ";
-            cin >> addr;
+            clearInputBuffer();
+            name = getStringInput("Enter new Name: ");
+            contact = getStringInput("Enter new Contact: ");
+            email = getStringInput("Enter new Email: ");
+            addr = getStringInput("Enter new Address: ");
             c.setID(cid);
             c.setName(name);
             c.setContact(contact);
@@ -307,16 +312,16 @@ public:
             float price;
             cout << "Enter new Product ID: ";
             cin >> pid;
-            cout << "Enter new Name: ";
-            cin >> name;
+            clearInputBuffer();
+            name = getStringInput("Enter new Name: ");
             cout << "Enter new Category ID: ";
             cin >> catId;
             cout << "Enter new Price: ";
             cin >> price;
             cout << "Enter new Quantity: ";
             cin >> qty;
-            cout << "Enter new Description: ";
-            cin >> desc;
+            clearInputBuffer();
+            desc = getStringInput("Enter new Description: ");
             p.setProductID(pid);
             p.setProductName(name);
             p.setCategoryID(catId);
@@ -472,14 +477,11 @@ void customerMenu() {
             cout << "\n--- Add Customer ---\n";
             cout << "Enter Customer ID: ";
             cin >> id;
-            cout << "Enter Name: ";
-            cin >> name;
-            cout << "Enter Contact: ";
-            cin >> contact;
-            cout << "Enter Email: ";
-            cin >> email;
-            cout << "Enter Address: ";
-            cin >> addr;
+            clearInputBuffer();
+            name = getStringInput("Enter Name: ");
+            contact = getStringInput("Enter Contact: ");
+            email = getStringInput("Enter Email: ");
+            addr = getStringInput("Enter Address: ");
             c.setID(id);
             c.setName(name);
             c.setContact(contact);
@@ -555,16 +557,16 @@ void productMenu() {
             cout << "\n--- Add Product ---\n";
             cout << "Enter Product ID: ";
             cin >> id;
-            cout << "Enter Name: ";
-            cin >> name;
+            clearInputBuffer();
+            name = getStringInput("Enter Name: ");
             cout << "Enter Category ID: ";
             cin >> catId;
             cout << "Enter Price: ";
             cin >> price;
             cout << "Enter Quantity: ";
             cin >> qty;
-            cout << "Enter Description: ";
-            cin >> desc;
+            clearInputBuffer();
+            desc = getStringInput("Enter Description: ");
             p.setProductID(id);
             p.setProductName(name);
             p.setCategoryID(catId);
