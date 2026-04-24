@@ -1,5 +1,4 @@
 #include <iostream>
-#include <vector>
 using namespace std;
 
 void clearInputBuffer() {
@@ -7,59 +6,59 @@ void clearInputBuffer() {
     cin.ignore(1000, '\n');
 }
 
-class Customer {
-private:
-    int customerID;
-    string customerName;
-    string contactNumber;
+class Person {
+protected:
+    int id;
+    string name;
+    string contact;
     string email;
+
+public:
+    Person() {
+        id = 0;
+        name = "";
+        contact = "";
+        email = "";
+    }
+
+    void setID(int i) { id = i; }
+    void setName(string n) { name = n; }
+    void setContact(string c) { contact = c; }
+    void setEmail(string e) { email = e; }
+
+    int getID() { return id; }
+    string getName() { return name; }
+    string getContact() { return contact; }
+    string getEmail() { return email; }
+
+    void display() {
+        cout << "ID: " << id << endl;
+        cout << "Name: " << name << endl;
+        cout << "Contact: " << contact << endl;
+        cout << "Email: " << email << endl;
+    }
+};
+
+class Customer : public Person {
+private:
     string address;
 
 public:
     Customer() {
-        customerID = 0;
-        customerName = "";
-        contactNumber = "";
-        email = "";
         address = "";
     }
 
-    void setCustomerID(int id) { customerID = id; }
-    void setCustomerName(string name) { customerName = name; }
-    void setContactNumber(string number) { contactNumber = number; }
-    void setEmail(string e) { email = e; }
     void setAddress(string a) { address = a; }
-
-    int getCustomerID() { return customerID; }
-    string getCustomerName() { return customerName; }
-    string getContactNumber() { return contactNumber; }
-    string getEmail() { return email; }
     string getAddress() { return address; }
 
-    void addCustomer() {
-        cout << "Adding new customer: " << customerName << endl;
-        cout << "Customer ID: " << customerID << endl;
-        cout << "Contact Number: " << contactNumber << endl;
-        cout << "Email: " << email << endl;
-        cout << "Address: " << address << endl;
-    }
-
-    void updateCustomer() {
-        cout << "Updating customer information for: " << customerName << endl;
-        cout << "Customer ID: " << customerID << endl;
-    }
-
-    void placeOrder(int orderID) {
-        cout << "Placing order #" << orderID << " for customer: " << customerName << endl;
-        cout << "Order placed successfully!" << endl;
-    }
-
     void display() {
-        cout << "Customer ID: " << customerID << endl;
-        cout << "Name: " << customerName << endl;
-        cout << "Contact: " << contactNumber << endl;
+        cout << "========== CUSTOMER DETAILS ==========" << endl;
+        cout << "ID: " << id << endl;
+        cout << "Name: " << name << endl;
+        cout << "Contact: " << contact << endl;
         cout << "Email: " << email << endl;
         cout << "Address: " << address << endl;
+        cout << "=======================================" << endl;
     }
 };
 
@@ -96,31 +95,20 @@ public:
     int getQuantity() { return quantityInStock; }
     string getDescription() { return description; }
 
-    void addProduct() {
-        cout << "Product " << productName << " added successfully!" << endl;
+    void display() {
+        cout << "ID: " << productID << " | Name: " << productName 
+             << " | Price: $" << price << " | Stock: " << quantityInStock << endl;
     }
 
-    void updateProduct() {
-        cout << "Product " << productName << " updated successfully!" << endl;
-    }
-
-    void deleteProduct() {
-        cout << "Product " << productName << " deleted successfully!" << endl;
-    }
-
-    void updateStock(int quantity) {
-        quantityInStock += quantity;
-        cout << "Stock updated. New quantity: " << quantityInStock << endl;
-    }
-
-    void getProductDetails() {
-        cout << "=== Product Details ===" << endl;
+    void displayDetails() {
+        cout << "========== PRODUCT DETAILS ==========" << endl;
         cout << "ID: " << productID << endl;
         cout << "Name: " << productName << endl;
         cout << "Category ID: " << categoryID << endl;
         cout << "Price: $" << price << endl;
         cout << "Stock: " << quantityInStock << endl;
         cout << "Description: " << description << endl;
+        cout << "======================================" << endl;
     }
 };
 
@@ -129,7 +117,7 @@ private:
     int orderID;
     string orderDate;
     int customerID;
-    int productList[100];
+    Product products[50];
     int productCount;
     float totalAmount;
     string orderStatus;
@@ -139,12 +127,9 @@ public:
         orderID = 0;
         orderDate = "";
         customerID = 0;
+        productCount = 0;
         totalAmount = 0.0;
         orderStatus = "Pending";
-        productCount = 0;
-        for (int i = 0; i < 100; i++) {
-            productList[i] = 0;
-        }
     }
 
     void setOrderID(int id) { orderID = id; }
@@ -152,83 +137,329 @@ public:
     void setCustomerID(int cid) { customerID = cid; }
     void setOrderStatus(string status) { orderStatus = status; }
     void setTotalAmount(float amount) { totalAmount = amount; }
+    void addProduct(Product p) { 
+        if (productCount < 50) {
+            products[productCount] = p;
+            productCount++;
+        }
+    }
 
     int getOrderID() { return orderID; }
     string getOrderDate() { return orderDate; }
     int getCustomerID() { return customerID; }
     float getTotalAmount() { return totalAmount; }
     string getOrderStatus() { return orderStatus; }
+    int getProductCount() { return productCount; }
 
-    void createOrder(int id, string date, int custID, int products[], int count) {
-        orderID = id;
-        orderDate = date;
-        customerID = custID;
-        productCount = count;
-        for (int i = 0; i < count; i++) {
-            productList[i] = products[i];
-        }
-        orderStatus = "Created";
-        cout << "Order #" << orderID << " created successfully for Customer #" << customerID << endl;
+    void display() {
+        cout << "ID: " << orderID << " | Date: " << orderDate 
+             << " | Customer: " << customerID << " | Status: " << orderStatus << endl;
     }
 
-    void calculateTotal(float prices[], int count) {
-        totalAmount = 0;
-        for (int i = 0; i < productCount && i < count; i++) {
-            totalAmount += prices[i];
-        }
-        cout << "Total amount calculated: $" << totalAmount << endl;
-    }
-
-    void updateOrderStatus(string newStatus) {
-        cout << "Updating order status from '" << orderStatus << "' to '" << newStatus << "'" << endl;
-        orderStatus = newStatus;
-    }
-
-    void cancelOrder() {
-        if (orderStatus == "Cancelled") {
-            cout << "Order is already cancelled!" << endl;
-        } else if (orderStatus == "Delivered") {
-            cout << "Order has already been delivered!" << endl;
-        } else {
-            orderStatus = "Cancelled";
-            cout << "Order #" << orderID << " has been cancelled successfully!" << endl;
-        }
-    }
-
-    void displayOrderDetails() {
+    void displayDetails() {
         cout << "========== ORDER DETAILS ==========" << endl;
         cout << "Order ID: " << orderID << endl;
         cout << "Order Date: " << orderDate << endl;
         cout << "Customer ID: " << customerID << endl;
-        cout << "Product List: ";
+        cout << "Products (" << productCount << "): ";
         for (int i = 0; i < productCount; i++) {
-            cout << productList[i] << " ";
+            cout << products[i].getProductID() << " ";
         }
         cout << endl;
         cout << "Total Amount: $" << totalAmount << endl;
-        cout << "Order Status: " << orderStatus << endl;
-        cout << "===================================\n" << endl;
+        cout << "Status: " << orderStatus << endl;
+        cout << "====================================" << endl;
     }
 };
 
-Customer customer;
-Product product;
-Order order;
+class CustomerCollection {
+private:
+    Customer customers[100];
+    int count;
+
+public:
+    CustomerCollection() {
+        count = 0;
+    }
+
+    void Add(Customer c) {
+        if (count < 100) {
+            customers[count] = c;
+            count++;
+            cout << "Customer added successfully! (Total: " << count << ")" << endl;
+        } else {
+            cout << "Collection is full!" << endl;
+        }
+    }
+
+    void Remove(int id) {
+        int index = FindByID(id);
+        if (index != -1) {
+            for (int i = index; i < count - 1; i++) {
+                customers[i] = customers[i + 1];
+            }
+            count--;
+            cout << "Customer removed successfully!" << endl;
+        } else {
+            cout << "Customer not found!" << endl;
+        }
+    }
+
+    void Update(int id) {
+        int index = FindByID(id);
+        if (index != -1) {
+            Customer c;
+            int cid;
+            string name, contact, email, addr;
+            cout << "Enter new Customer ID: ";
+            cin >> cid;
+            cout << "Enter new Name: ";
+            cin >> name;
+            cout << "Enter new Contact: ";
+            cin >> contact;
+            cout << "Enter new Email: ";
+            cin >> email;
+            cout << "Enter new Address: ";
+            cin >> addr;
+            c.setID(cid);
+            c.setName(name);
+            c.setContact(contact);
+            c.setEmail(email);
+            c.setAddress(addr);
+            customers[index] = c;
+            cout << "Customer updated successfully!" << endl;
+        } else {
+            cout << "Customer not found!" << endl;
+        }
+    }
+
+    void DisplayAll() {
+        if (count == 0) {
+            cout << "No customers in collection!" << endl;
+            return;
+        }
+        cout << "\n========== ALL CUSTOMERS ==========" << endl;
+        for (int i = 0; i < count; i++) {
+            customers[i].display();
+            cout << endl;
+        }
+    }
+
+    int FindByID(int id) {
+        for (int i = 0; i < count; i++) {
+            if (customers[i].getID() == id) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    Customer* GetCustomer(int id) {
+        int index = FindByID(id);
+        if (index != -1) {
+            return &customers[index];
+        }
+        return NULL;
+    }
+
+    int getCount() { return count; }
+};
+
+class ProductCollection {
+private:
+    Product products[100];
+    int count;
+
+public:
+    ProductCollection() {
+        count = 0;
+    }
+
+    void Add(Product p) {
+        if (count < 100) {
+            products[count] = p;
+            count++;
+            cout << "Product added successfully! (Total: " << count << ")" << endl;
+        } else {
+            cout << "Collection is full!" << endl;
+        }
+    }
+
+    void Remove(int id) {
+        int index = FindByID(id);
+        if (index != -1) {
+            for (int i = index; i < count - 1; i++) {
+                products[i] = products[i + 1];
+            }
+            count--;
+            cout << "Product removed successfully!" << endl;
+        } else {
+            cout << "Product not found!" << endl;
+        }
+    }
+
+    void Update(int id) {
+        int index = FindByID(id);
+        if (index != -1) {
+            Product p;
+            int pid, catId, qty;
+            string name, desc;
+            float price;
+            cout << "Enter new Product ID: ";
+            cin >> pid;
+            cout << "Enter new Name: ";
+            cin >> name;
+            cout << "Enter new Category ID: ";
+            cin >> catId;
+            cout << "Enter new Price: ";
+            cin >> price;
+            cout << "Enter new Quantity: ";
+            cin >> qty;
+            cout << "Enter new Description: ";
+            cin >> desc;
+            p.setProductID(pid);
+            p.setProductName(name);
+            p.setCategoryID(catId);
+            p.setPrice(price);
+            p.setQuantity(qty);
+            p.setDescription(desc);
+            products[index] = p;
+            cout << "Product updated successfully!" << endl;
+        } else {
+            cout << "Product not found!" << endl;
+        }
+    }
+
+    void DisplayAll() {
+        if (count == 0) {
+            cout << "No products in collection!" << endl;
+            return;
+        }
+        cout << "\n========== ALL PRODUCTS ==========" << endl;
+        for (int i = 0; i < count; i++) {
+            products[i].display();
+        }
+        cout << "=================================" << endl;
+    }
+
+    int FindByID(int id) {
+        for (int i = 0; i < count; i++) {
+            if (products[i].getProductID() == id) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    Product* GetProduct(int id) {
+        int index = FindByID(id);
+        if (index != -1) {
+            return &products[index];
+        }
+        return NULL;
+    }
+
+    int getCount() { return count; }
+};
+
+class OrderCollection {
+private:
+    Order orders[100];
+    int count;
+
+public:
+    OrderCollection() {
+        count = 0;
+    }
+
+    void Add(Order o) {
+        if (count < 100) {
+            orders[count] = o;
+            count++;
+            cout << "Order added successfully! (Total: " << count << ")" << endl;
+        } else {
+            cout << "Collection is full!" << endl;
+        }
+    }
+
+    void Remove(int id) {
+        int index = FindByID(id);
+        if (index != -1) {
+            for (int i = index; i < count - 1; i++) {
+                orders[i] = orders[i + 1];
+            }
+            count--;
+            cout << "Order removed successfully!" << endl;
+        } else {
+            cout << "Order not found!" << endl;
+        }
+    }
+
+    void Update(int id) {
+        int index = FindByID(id);
+        if (index != -1) {
+            string status;
+            cout << "Enter new status: ";
+            cin >> status;
+            orders[index].setOrderStatus(status);
+            cout << "Order updated successfully!" << endl;
+        } else {
+            cout << "Order not found!" << endl;
+        }
+    }
+
+    void DisplayAll() {
+        if (count == 0) {
+            cout << "No orders in collection!" << endl;
+            return;
+        }
+        cout << "\n========== ALL ORDERS ==========" << endl;
+        for (int i = 0; i < count; i++) {
+            orders[i].display();
+        }
+        cout << "===============================" << endl;
+    }
+
+    int FindByID(int id) {
+        for (int i = 0; i < count; i++) {
+            if (orders[i].getOrderID() == id) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    Order* GetOrder(int id) {
+        int index = FindByID(id);
+        if (index != -1) {
+            return &orders[index];
+        }
+        return NULL;
+    }
+
+    int getCount() { return count; }
+};
+
+CustomerCollection customers;
+ProductCollection products;
+OrderCollection orders;
 
 void customerMenu() {
     int choice;
     int id;
     string name, contact, email, addr;
+    Customer c;
 
     do {
         cout << "\n========================================\n";
         cout << "        CUSTOMER MANAGEMENT MENU\n";
         cout << "========================================\n";
         cout << "1. Add Customer\n";
-        cout << "2. Update Customer\n";
-        cout << "3. Place Order\n";
-        cout << "4. Display Customer\n";
-        cout << "5. Back to Main Menu\n";
+        cout << "2. Remove Customer\n";
+        cout << "3. Update Customer\n";
+        cout << "4. Search Customer\n";
+        cout << "5. Display All Customers\n";
+        cout << "6. Back to Main Menu\n";
         cout << "Enter your choice: ";
         if (!(cin >> choice)) {
             clearInputBuffer();
@@ -243,56 +474,56 @@ void customerMenu() {
             cin >> id;
             cout << "Enter Name: ";
             cin >> name;
-            cout << "Enter Contact Number: ";
+            cout << "Enter Contact: ";
             cin >> contact;
             cout << "Enter Email: ";
             cin >> email;
             cout << "Enter Address: ";
             cin >> addr;
-            customer.setCustomerID(id);
-            customer.setCustomerName(name);
-            customer.setContactNumber(contact);
-            customer.setEmail(email);
-            customer.setAddress(addr);
-            cout << "\n--- Customer Information Entered ---\n";
-            customer.display();
-            cout << "-----------------------------------\n";
-            customer.addCustomer();
+            c.setID(id);
+            c.setName(name);
+            c.setContact(contact);
+            c.setEmail(email);
+            c.setAddress(addr);
+            cout << "\n--- Customer Information ---\n";
+            c.display();
+            customers.Add(c);
             break;
         case 2:
-            cout << "\n--- Update Customer ---\n";
-            cout << "Enter Customer ID: ";
+            cout << "\n--- Remove Customer ---\n";
+            cout << "Enter Customer ID to remove: ";
             cin >> id;
-            cout << "Enter Name: ";
-            cin >> name;
-            cout << "Enter Contact Number: ";
-            cin >> contact;
-            cout << "Enter Email: ";
-            cin >> email;
-            cout << "Enter Address: ";
-            cin >> addr;
-            customer.setCustomerID(id);
-            customer.setCustomerName(name);
-            customer.setContactNumber(contact);
-            customer.setEmail(email);
-            customer.setAddress(addr);
-            customer.updateCustomer();
+            customers.Remove(id);
             break;
         case 3:
-            cout << "Enter Order ID: ";
+            cout << "\n--- Update Customer ---\n";
+            cout << "Enter Customer ID to update: ";
             cin >> id;
-            customer.placeOrder(id);
+            customers.Update(id);
             break;
         case 4:
-            customer.display();
+            cout << "\n--- Search Customer ---\n";
+            cout << "Enter Customer ID to search: ";
+            cin >> id;
+            {
+                Customer* c = customers.GetCustomer(id);
+                if (c != NULL) {
+                    c->display();
+                } else {
+                    cout << "Customer not found!" << endl;
+                }
+            }
             break;
         case 5:
+            customers.DisplayAll();
+            break;
+        case 6:
             cout << "Returning to Main Menu...\n";
             break;
         default:
             cout << "Invalid choice!\n";
         }
-    } while (choice != 5);
+    } while (choice != 6);
 }
 
 void productMenu() {
@@ -300,16 +531,17 @@ void productMenu() {
     int id, catId, qty;
     string name, desc;
     float price;
+    Product p;
 
     do {
         cout << "\n========================================\n";
         cout << "        PRODUCT MANAGEMENT MENU\n";
         cout << "========================================\n";
         cout << "1. Add Product\n";
-        cout << "2. Update Product\n";
-        cout << "3. Delete Product\n";
-        cout << "4. Update Stock\n";
-        cout << "5. Display Product Details\n";
+        cout << "2. Remove Product\n";
+        cout << "3. Update Product\n";
+        cout << "4. Search Product\n";
+        cout << "5. Display All Products\n";
         cout << "6. Back to Main Menu\n";
         cout << "Enter your choice: ";
         if (!(cin >> choice)) {
@@ -323,7 +555,7 @@ void productMenu() {
             cout << "\n--- Add Product ---\n";
             cout << "Enter Product ID: ";
             cin >> id;
-            cout << "Enter Product Name: ";
+            cout << "Enter Name: ";
             cin >> name;
             cout << "Enter Category ID: ";
             cin >> catId;
@@ -333,49 +565,43 @@ void productMenu() {
             cin >> qty;
             cout << "Enter Description: ";
             cin >> desc;
-            product.setProductID(id);
-            product.setProductName(name);
-            product.setCategoryID(catId);
-            product.setPrice(price);
-            product.setQuantity(qty);
-            product.setDescription(desc);
-            cout << "\n--- Product Information Entered ---\n";
-            product.getProductDetails();
-            cout << "------------------------------------\n";
-            product.addProduct();
+            p.setProductID(id);
+            p.setProductName(name);
+            p.setCategoryID(catId);
+            p.setPrice(price);
+            p.setQuantity(qty);
+            p.setDescription(desc);
+            cout << "\n--- Product Information ---\n";
+            p.displayDetails();
+            products.Add(p);
             break;
         case 2:
-            cout << "\n--- Update Product ---\n";
-            cout << "Enter Product ID: ";
+            cout << "\n--- Remove Product ---\n";
+            cout << "Enter Product ID to remove: ";
             cin >> id;
-            cout << "Enter Product Name: ";
-            cin >> name;
-            cout << "Enter Category ID: ";
-            cin >> catId;
-            cout << "Enter Price: ";
-            cin >> price;
-            cout << "Enter Quantity: ";
-            cin >> qty;
-            cout << "Enter Description: ";
-            cin >> desc;
-            product.setProductID(id);
-            product.setProductName(name);
-            product.setCategoryID(catId);
-            product.setPrice(price);
-            product.setQuantity(qty);
-            product.setDescription(desc);
-            product.updateProduct();
+            products.Remove(id);
             break;
         case 3:
-            product.deleteProduct();
+            cout << "\n--- Update Product ---\n";
+            cout << "Enter Product ID to update: ";
+            cin >> id;
+            products.Update(id);
             break;
         case 4:
-            cout << "Enter quantity change (positive to add, negative to reduce): ";
-            cin >> qty;
-            product.updateStock(qty);
+            cout << "\n--- Search Product ---\n";
+            cout << "Enter Product ID to search: ";
+            cin >> id;
+            {
+                Product* p = products.GetProduct(id);
+                if (p != NULL) {
+                    p->displayDetails();
+                } else {
+                    cout << "Product not found!" << endl;
+                }
+            }
             break;
         case 5:
-            product.getProductDetails();
+            products.DisplayAll();
             break;
         case 6:
             cout << "Returning to Main Menu...\n";
@@ -388,19 +614,19 @@ void productMenu() {
 
 void orderMenu() {
     int choice;
-    int id, custId, count, prods[100];
+    int id, custId, count;
     string date;
-    float prices[100];
+    Order o;
 
     do {
         cout << "\n========================================\n";
         cout << "        ORDER MANAGEMENT MENU\n";
         cout << "========================================\n";
         cout << "1. Create Order\n";
-        cout << "2. Calculate Total\n";
+        cout << "2. Remove Order\n";
         cout << "3. Update Order Status\n";
-        cout << "4. Cancel Order\n";
-        cout << "5. Display Order Details\n";
+        cout << "4. Search Order\n";
+        cout << "5. Display All Orders\n";
         cout << "6. Back to Main Menu\n";
         cout << "Enter your choice: ";
         if (!(cin >> choice)) {
@@ -418,43 +644,53 @@ void orderMenu() {
             cin >> date;
             cout << "Enter Customer ID: ";
             cin >> custId;
-            cout << "Enter number of products: ";
+            cout << "How many products in this order? ";
             cin >> count;
+            o.setOrderID(id);
+            o.setOrderDate(date);
+            o.setCustomerID(custId);
             for (int i = 0; i < count; i++) {
+                int pid;
                 cout << "Enter Product ID " << i + 1 << ": ";
-                cin >> prods[i];
+                cin >> pid;
+                Product* p = products.GetProduct(pid);
+                if (p != NULL) {
+                    o.addProduct(*p);
+                } else {
+                    cout << "Product not found! Skipping..." << endl;
+                }
             }
-            order.createOrder(id, date, custId, prods, count);
-            cout << "\n--- Order Information Entered ---\n";
-            cout << "Order ID: " << id << endl;
-            cout << "Order Date: " << date << endl;
-            cout << "Customer ID: " << custId << endl;
-            cout << "Products: ";
-            for (int i = 0; i < count; i++) {
-                cout << prods[i] << " ";
-            }
-            cout << endl;
-            cout << "---------------------------------\n";
+            orders.Add(o);
+            cout << "\n--- Order Created ---\n";
+            o.displayDetails();
             break;
         case 2:
-            cout << "Enter number of products: ";
-            cin >> count;
-            for (int i = 0; i < count; i++) {
-                cout << "Enter Price for Product " << i + 1 << ": ";
-                cin >> prices[i];
-            }
-            order.calculateTotal(prices, count);
+            cout << "\n--- Remove Order ---\n";
+            cout << "Enter Order ID to remove: ";
+            cin >> id;
+            orders.Remove(id);
             break;
         case 3:
-            cout << "Enter new status: ";
-            cin >> date;
-            order.updateOrderStatus(date);
+            cout << "\n--- Update Order Status ---\n";
+            cout << "Enter Order ID to update: ";
+            cin >> id;
+            orders.Update(id);
             break;
         case 4:
-            order.cancelOrder();
+            cout << "\n--- Search Order ---\n";
+            cout << "Enter Order ID to search: ";
+            cin >> id;
+            {
+                Order* o = orders.GetOrder(id);
+                if (o != NULL) {
+                    o->displayDetails();
+                } else {
+                    cout << "Order not found!" << endl;
+                }
+            }
             break;
         case 5:
-            order.displayOrderDetails();
+            orders.DisplayAll();
             break;
         case 6:
             cout << "Returning to Main Menu...\n";
