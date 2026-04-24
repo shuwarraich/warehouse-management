@@ -1,5 +1,11 @@
 #include <iostream>
+#include <limits>
 using namespace std;
+
+void clearInputBuffer() {
+    cin.clear();
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+}
 
 class Warehouse {
 private:
@@ -14,18 +20,6 @@ public:
         location = "";
         totalCapacity = 0;
         availableSpace = 0;
-    }
-
-    Warehouse(const Warehouse& w) {
-        cout << "This is a copy constructor" << endl;
-        warehouseID = w.warehouseID;
-        location = w.location;
-        totalCapacity = w.totalCapacity;
-        availableSpace = w.availableSpace;
-    }
-
-    ~Warehouse() {
-        cout << "Warehouse object " << warehouseID << " is being destroyed." << endl;
     }
 
     void setWarehouseID(int id) { warehouseID = id; }
@@ -83,18 +77,6 @@ public:
         lastUpdatedDate = "";
     }
 
-    Inventory(const Inventory& i) {
-        cout << "This is a copy constructor" << endl;
-        inventoryID = i.inventoryID;
-        productList = i.productList;
-        totalItems = i.totalItems;
-        lastUpdatedDate = i.lastUpdatedDate;
-    }
-
-    ~Inventory() {
-        cout << "Inventory object " << inventoryID << " is being destroyed." << endl;
-    }
-
     void setInventoryID(int id) { inventoryID = id; }
     void setProductList(string list) { productList = list; }
     void setTotalItems(int items) { totalItems = items; }
@@ -147,19 +129,6 @@ public:
         deliveryStatus = "Pending";
     }
 
-    Shipment(const Shipment& s) {
-        cout << "This is a copy constructor" << endl;
-        shipmentID = s.shipmentID;
-        orderID = s.orderID;
-        shipmentDate = s.shipmentDate;
-        deliveryDate = s.deliveryDate;
-        deliveryStatus = s.deliveryStatus;
-    }
-
-    ~Shipment() {
-        cout << "Shipment object " << shipmentID << " is being destroyed." << endl;
-    }
-
     void setShipmentID(int id) { shipmentID = id; }
     void setOrderID(int oid) { orderID = oid; }
     void setShipmentDate(string d) { shipmentDate = d; }
@@ -196,27 +165,32 @@ public:
     }
 };
 
-int main() {
+void warehouseMenu() {
     int choice;
+    Warehouse w;
+    int id, cap, space;
+    string loc;
 
     do {
         cout << "\n========================================\n";
-        cout << "WAREHOUSE MANAGEMENT SYSTEM\n";
+        cout << "       WAREHOUSE MANAGEMENT MENU\n";
         cout << "========================================\n";
-        cout << "1. Manage Warehouse\n";
-        cout << "2. Manage Inventory\n";
-        cout << "3. Manage Shipment\n";
-        cout << "4. Exit\n";
+        cout << "1. Add Warehouse\n";
+        cout << "2. Update Warehouse\n";
+        cout << "3. Check Capacity\n";
+        cout << "4. Allocate Space\n";
+        cout << "5. Remove Product\n";
+        cout << "6. Display Warehouse\n";
+        cout << "7. Back to Main Menu\n";
         cout << "Enter your choice: ";
-        cin >> choice;
+        if (!(cin >> choice)) {
+            clearInputBuffer();
+            cout << "Invalid input! Please enter a number.\n";
+            continue;
+        }
 
         switch (choice) {
-
-        case 1: {
-            Warehouse w;
-            int id, cap, space;
-            string loc;
-
+        case 1:
             cout << "\n--- Add Warehouse ---\n";
             cout << "Enter Warehouse ID: ";
             cin >> id;
@@ -226,24 +200,79 @@ int main() {
             cin >> cap;
             cout << "Enter Available Space: ";
             cin >> space;
-
             w.setWarehouseID(id);
             w.setLocation(loc);
             w.setTotalCapacity(cap);
             w.setAvailableSpace(space);
-
             w.addWarehouse();
-            w.display();
-
             break;
+        case 2:
+            cout << "\n--- Update Warehouse ---\n";
+            cout << "Enter new Warehouse ID: ";
+            cin >> id;
+            cout << "Enter new Location: ";
+            cin >> loc;
+            cout << "Enter new Total Capacity: ";
+            cin >> cap;
+            cout << "Enter new Available Space: ";
+            cin >> space;
+            w.setWarehouseID(id);
+            w.setLocation(loc);
+            w.setTotalCapacity(cap);
+            w.setAvailableSpace(space);
+            w.updateWarehouse();
+            break;
+        case 3:
+            w.checkCapacity();
+            break;
+        case 4:
+            cout << "Enter space to allocate: ";
+            cin >> space;
+            w.allocateSpace(space);
+            break;
+        case 5:
+            cout << "Enter space to release: ";
+            cin >> space;
+            w.removeProduct(space);
+            break;
+        case 6:
+            w.display();
+            break;
+        case 7:
+            cout << "Returning to Main Menu...\n";
+            break;
+        default:
+            cout << "Invalid choice!\n";
+        }
+    } while (choice != 7);
+}
+
+void inventoryMenu() {
+    int choice;
+    Inventory i;
+    int id, items;
+    string list, date;
+
+    do {
+        cout << "\n========================================\n";
+        cout << "        INVENTORY MANAGEMENT MENU\n";
+        cout << "========================================\n";
+        cout << "1. Add Item\n";
+        cout << "2. Remove Item\n";
+        cout << "3. Update Quantity\n";
+        cout << "4. Check Stock\n";
+        cout << "5. Display Inventory\n";
+        cout << "6. Back to Main Menu\n";
+        cout << "Enter your choice: ";
+        if (!(cin >> choice)) {
+            clearInputBuffer();
+            cout << "Invalid input! Please enter a number.\n";
+            continue;
         }
 
-        case 2: {
-            Inventory i;
-            int id, items;
-            string list, date;
-
-            cout << "\n--- Add Inventory ---\n";
+        switch (choice) {
+        case 1:
+            cout << "\n--- Add Item ---\n";
             cout << "Enter Inventory ID: ";
             cin >> id;
             cout << "Enter Product List: ";
@@ -252,24 +281,61 @@ int main() {
             cin >> items;
             cout << "Enter Last Updated Date: ";
             cin >> date;
-
             i.setInventoryID(id);
             i.setProductList(list);
             i.setTotalItems(items);
             i.setDate(date);
-
             i.addItem();
-            i.display();
-
             break;
+        case 2:
+            i.removeItem();
+            break;
+        case 3:
+            cout << "Enter quantity change (positive to add, negative to reduce): ";
+            cin >> items;
+            i.updateQuantity(items);
+            break;
+        case 4:
+            i.checkStock();
+            break;
+        case 5:
+            i.display();
+            break;
+        case 6:
+            cout << "Returning to Main Menu...\n";
+            break;
+        default:
+            cout << "Invalid choice!\n";
+        }
+    } while (choice != 6);
+}
+
+void shipmentMenu() {
+    int choice;
+    Shipment s;
+    int sid, oid;
+    string sDate, dDate, status;
+
+    do {
+        cout << "\n========================================\n";
+        cout << "        SHIPMENT MANAGEMENT MENU\n";
+        cout << "========================================\n";
+        cout << "1. Create Shipment\n";
+        cout << "2. Update Status\n";
+        cout << "3. Track Shipment\n";
+        cout << "4. Confirm Delivery\n";
+        cout << "5. Display Shipment\n";
+        cout << "6. Back to Main Menu\n";
+        cout << "Enter your choice: ";
+        if (!(cin >> choice)) {
+            clearInputBuffer();
+            cout << "Invalid input! Please enter a number.\n";
+            continue;
         }
 
-        case 3: {
-            Shipment s;
-            int sid, oid;
-            string sDate, dDate, status;
-
-            cout << "\n--- Add Shipment ---\n";
+        switch (choice) {
+        case 1:
+            cout << "\n--- Create Shipment ---\n";
             cout << "Enter Shipment ID: ";
             cin >> sid;
             cout << "Enter Order ID: ";
@@ -280,27 +346,71 @@ int main() {
             cin >> dDate;
             cout << "Enter Status: ";
             cin >> status;
-
             s.setShipmentID(sid);
             s.setOrderID(oid);
             s.setShipmentDate(sDate);
             s.setDeliveryDate(dDate);
             s.setStatus(status);
-
             s.createShipment();
-            s.display();
-
             break;
-        }
-
+        case 2:
+            cout << "Enter new status: ";
+            cin >> status;
+            s.updateStatus(status);
+            break;
+        case 3:
+            s.trackShipment();
+            break;
         case 4:
-            cout << "Exiting program...\n";
+            s.confirmDelivery();
             break;
-
+        case 5:
+            s.display();
+            break;
+        case 6:
+            cout << "Returning to Main Menu...\n";
+            break;
         default:
             cout << "Invalid choice!\n";
         }
+    } while (choice != 6);
+}
 
+int main() {
+    int choice;
+
+    do {
+        cout << "\n========================================\n";
+        cout << "  WAREHOUSE MANAGEMENT SYSTEM\n";
+        cout << "  Contributor: ayesha-ijaz\n";
+        cout << "========================================\n";
+        cout << "1. Manage Warehouse\n";
+        cout << "2. Manage Inventory\n";
+        cout << "3. Manage Shipment\n";
+        cout << "4. Exit\n";
+        cout << "Enter your choice: ";
+        if (!(cin >> choice)) {
+            clearInputBuffer();
+            cout << "Invalid input! Please enter a number.\n";
+            continue;
+        }
+
+        switch (choice) {
+        case 1:
+            warehouseMenu();
+            break;
+        case 2:
+            inventoryMenu();
+            break;
+        case 3:
+            shipmentMenu();
+            break;
+        case 4:
+            cout << "Exiting program...\n";
+            break;
+        default:
+            cout << "Invalid choice!\n";
+        }
     } while (choice != 4);
 
     return 0;
