@@ -1,5 +1,4 @@
 #include <iostream>
-#include <vector>
 #include <string>
 using namespace std;
 
@@ -8,49 +7,66 @@ void clearInputBuffer() {
     cin.ignore(1000, '\n');
 }
 
-class Customer {
-private:
-    int customerID;
-    string customerName;
-    string contactNumber;
+string getStringInput(string prompt) {
+    cout << prompt;
+    string input;
+    getline(cin, input);
+    return input;
+}
+
+class Person {
+protected:
+    int id;
+    string name;
+    string contact;
     string email;
+
+public:
+    Person() {
+        id = 0;
+        name = "";
+        contact = "";
+        email = "";
+    }
+
+    void setID(int i) { id = i; }
+    void setName(string n) { name = n; }
+    void setContact(string c) { contact = c; }
+    void setEmail(string e) { email = e; }
+
+    int getID() { return id; }
+    string getName() { return name; }
+    string getContact() { return contact; }
+    string getEmail() { return email; }
+
+    void display() {
+        cout << "ID: " << id << endl;
+        cout << "Name: " << name << endl;
+        cout << "Contact: " << contact << endl;
+        cout << "Email: " << email << endl;
+    }
+};
+
+class Customer : public Person {
+private:
     string address;
 
 public:
     Customer() {
-        customerID = 0;
-        customerName = "";
-        contactNumber = "";
-        email = "";
         address = "";
     }
 
-    Customer(int id, string name, string contact, string e, string a) {
-        customerID = id;
-        customerName = name;
-        contactNumber = contact;
-        email = e;
-        address = a;
-    }
-
-    void setCustomerID(int id) { customerID = id; }
-    void setCustomerName(string name) { customerName = name; }
-    void setContactNumber(string number) { contactNumber = number; }
-    void setEmail(string e) { email = e; }
     void setAddress(string a) { address = a; }
-
-    int getCustomerID() { return customerID; }
-    string getCustomerName() { return customerName; }
-    string getContactNumber() { return contactNumber; }
-    string getEmail() { return email; }
     string getAddress() { return address; }
 
     void display() {
-        cout << "Customer ID: " << customerID << endl;
-        cout << "Name: " << customerName << endl;
-        cout << "Contact: " << contactNumber << endl;
+        cout << "========== CUSTOMER DETAILS ==========" << endl;
+        cout << "ID: " << id << endl;
+        cout << "Name: " << name << endl;
+        cout << "Contact: " << contact << endl;
         cout << "Email: " << email << endl;
         cout << "Address: " << address << endl;
+        cout << "=======================================" << endl;
     }
 };
 
@@ -73,15 +89,6 @@ public:
         description = "";
     }
 
-    Product(int id, string name, int catId, float p, int qty, string desc) {
-        productID = id;
-        productName = name;
-        categoryID = catId;
-        price = p;
-        quantityInStock = qty;
-        description = desc;
-    }
-
     void setProductID(int id) { productID = id; }
     void setProductName(string n) { productName = n; }
     void setCategoryID(int cid) { categoryID = cid; }
@@ -96,18 +103,20 @@ public:
     int getQuantity() { return quantityInStock; }
     string getDescription() { return description; }
 
-    void updateStock(int quantity) {
-        quantityInStock += quantity;
+    void display() {
+        cout << "ID: " << productID << " | Name: " << productName
+             << " | Price: $" << price << " | Stock: " << quantityInStock << endl;
     }
 
-    void display() {
-        cout << "=== Product Details ===" << endl;
+    void displayDetails() {
+        cout << "========== PRODUCT DETAILS ==========" << endl;
         cout << "ID: " << productID << endl;
         cout << "Name: " << productName << endl;
         cout << "Category ID: " << categoryID << endl;
         cout << "Price: $" << price << endl;
         cout << "Stock: " << quantityInStock << endl;
         cout << "Description: " << description << endl;
+        cout << "======================================" << endl;
     }
 };
 
@@ -116,7 +125,8 @@ private:
     int orderID;
     string orderDate;
     int customerID;
-    vector<int> productList;
+    Product products[50];
+    int productCount;
     float totalAmount;
     string orderStatus;
 
@@ -125,17 +135,9 @@ public:
         orderID = 0;
         orderDate = "";
         customerID = 0;
+        productCount = 0;
         totalAmount = 0.0;
         orderStatus = "Pending";
-    }
-
-    Order(int id, string date, int custID, vector<int> products, float total) {
-        orderID = id;
-        orderDate = date;
-        customerID = custID;
-        productList = products;
-        totalAmount = total;
-        orderStatus = "Created";
     }
 
     void setOrderID(int id) { orderID = id; }
@@ -143,266 +145,1096 @@ public:
     void setCustomerID(int cid) { customerID = cid; }
     void setOrderStatus(string status) { orderStatus = status; }
     void setTotalAmount(float amount) { totalAmount = amount; }
+    void addProduct(Product p) {
+        if (productCount < 50) {
+            products[productCount] = p;
+            productCount++;
+        }
+    }
 
     int getOrderID() { return orderID; }
     string getOrderDate() { return orderDate; }
     int getCustomerID() { return customerID; }
     float getTotalAmount() { return totalAmount; }
     string getOrderStatus() { return orderStatus; }
-    vector<int> getProductList() { return productList; }
-
-    void addProduct(int productID) {
-        productList.push_back(productID);
-    }
-
-    void calculateTotal(float price) {
-        totalAmount += price;
-    }
-
-    void updateOrderStatus(string newStatus) {
-        orderStatus = newStatus;
-    }
-
-    void cancelOrder() {
-        if (orderStatus == "Cancelled") {
-            cout << "Order is already cancelled!" << endl;
-        } else if (orderStatus == "Delivered") {
-            cout << "Order has already been delivered!" << endl;
-        } else {
-            orderStatus = "Cancelled";
-            cout << "Order #" << orderID << " has been cancelled successfully!" << endl;
-        }
-    }
+    int getProductCount() { return productCount; }
 
     void display() {
+        cout << "ID: " << orderID << " | Date: " << orderDate
+             << " | Customer: " << customerID << " | Status: " << orderStatus << endl;
+    }
+
+    void displayDetails() {
         cout << "========== ORDER DETAILS ==========" << endl;
         cout << "Order ID: " << orderID << endl;
         cout << "Order Date: " << orderDate << endl;
         cout << "Customer ID: " << customerID << endl;
-        cout << "Product List: ";
-        for (int i = 0; i < productList.size(); i++) {
-            cout << productList[i] << " ";
+        cout << "Products (" << productCount << "): ";
+        for (int i = 0; i < productCount; i++) {
+            cout << products[i].getProductID() << " ";
         }
         cout << endl;
         cout << "Total Amount: $" << totalAmount << endl;
-        cout << "Order Status: " << orderStatus << endl;
-        cout << "===================================\n" << endl;
+        cout << "Status: " << orderStatus << endl;
+        cout << "====================================" << endl;
+    }
+};
+
+class Address {
+private:
+    string city;
+
+public:
+    Address() {
+        city = "";
+    }
+    void setCity(string c) { city = c; }
+    string getCity() { return city; }
+    void display() {
+        cout << "City: " << city << endl;
+    }
+};
+
+class Employee : public Person {
+private:
+    Address address; // Composition (strong relationship)
+    string position;
+
+public:
+    Employee() : Person() {
+        position = "";
+    }
+    void setPosition(string p) { position = p; }
+    void setCity(string c) { address.setCity(c); }
+    string getPosition() { return position; }
+    string getCity() { return address.getCity(); }
+
+    void display() {
+        cout << "========== EMPLOYEE DETAILS ==========" << endl;
+        cout << "ID: " << id << endl;
+        cout << "Name: " << name << endl;
+        cout << "Contact: " << contact << endl;
+        cout << "Email: " << email << endl;
+        cout << "Position: " << position << endl;
+        address.display();
+        cout << "=======================================" << endl;
+    }
+};
+
+class Supplier : public Person {
+private:
+    Address* address; // Aggregation (weak relationship)
+    string companyName;
+
+public:
+    Supplier() : Person() {
+        address = NULL;
+        companyName = "";
+    }
+    void setCompanyName(string c) { companyName = c; }
+    void setAddress(Address* addr) { address = addr; }
+    string getCompanyName() { return companyName; }
+
+    void display() {
+        cout << "========== SUPPLIER DETAILS ==========" << endl;
+        cout << "ID: " << id << endl;
+        cout << "Name: " << name << endl;
+        cout << "Contact: " << contact << endl;
+        cout << "Email: " << email << endl;
+        cout << "Company: " << companyName << endl;
+        if (address != NULL)
+            address->display();
+        cout << "=======================================" << endl;
     }
 };
 
 class Category {
 private:
-    int id;
-    string name;
+    int categoryID;
+    string categoryName;
+    string description;
+
 public:
-    Category() { id = 0; name = ""; }
-    Category(int i, string n) { id = i; name = n; }
-    void set(int i, string n) { id = i; name = n; }
-    int getID() { return id; }
-    string getName() { return name; }
-    void display() { cout << "ID: " << id << " Name: " << name << endl; }
+    Category() {
+        categoryID = 0;
+        categoryName = "";
+        description = "";
+    }
+    void setCategoryID(int id) { categoryID = id; }
+    void setCategoryName(string n) { categoryName = n; }
+    void setDescription(string d) { description = d; }
+    int getCategoryID() { return categoryID; }
+    string getCategoryName() { return categoryName; }
+    string getDescription() { return description; }
+
+    void display() {
+        cout << "ID: " << categoryID << " | Name: " << categoryName
+             << " | Description: " << description << endl;
+    }
+
+    void displayDetails() {
+        cout << "========== CATEGORY DETAILS ==========" << endl;
+        cout << "Category ID: " << categoryID << endl;
+        cout << "Name: " << categoryName << endl;
+        cout << "Description: " << description << endl;
+        cout << "======================================" << endl;
+    }
 };
 
-class Supplier {
-private:
+class Entity {
+protected:
     int id;
     string name;
-    string contact;
-    string email;
+
 public:
-    Supplier() { id = 0; name = ""; contact = ""; email = ""; }
-    Supplier(int i, string n, string c, string e) { id = i; name = n; contact = c; email = e; }
-    void set(int i, string n, string c, string e) { id = i; name = n; contact = c; email = e; }
+    Entity() { id = 0; name = ""; }
+    void setID(int i) { id = i; }
+    void setName(string n) { name = n; }
     int getID() { return id; }
     string getName() { return name; }
-    string getContact() { return contact; }
-    string getEmail() { return email; }
-    void display() { cout << "ID: " << id << " Name: " << name << " Contact: " << contact << " Email: " << email << endl; }
+    void displayEntity() {
+        cout << "ID: " << id << " | Name: " << name << endl;
+    }
 };
 
-class Employee {
-private:
-    int id;
-    string name;
-    string position;
-    float salary;
-public:
-    Employee() { id = 0; name = ""; position = ""; salary = 0; }
-    Employee(int i, string n, string p, float s) { id = i; name = n; position = p; salary = s; }
-    void set(int i, string n, string p, float s) { id = i; name = n; position = p; salary = s; }
-    int getID() { return id; }
-    string getName() { return name; }
-    string getPosition() { return position; }
-    float getSalary() { return salary; }
-    void display() { cout << "ID: " << id << " Name: " << name << " Position: " << position << " Salary: " << salary << endl; }
-};
-
-class Warehouse {
-private:
-    int warehouseID;
+class Warehouse : public Entity {
+protected:
     string location;
-    int totalCapacity;
-    int availableSpace;
+    int capacity;
 
 public:
-    Warehouse() {
-        warehouseID = 0;
-        location = "";
-        totalCapacity = 0;
-        availableSpace = 0;
-    }
-
-    Warehouse(int id, string loc, int cap, int space) {
-        warehouseID = id;
-        location = loc;
-        totalCapacity = cap;
-        availableSpace = space;
-    }
-
-    void setWarehouseID(int id) { warehouseID = id; }
-    void setLocation(string loc) { location = loc; }
-    void setTotalCapacity(int cap) { totalCapacity = cap; }
-    void setAvailableSpace(int space) { availableSpace = space; }
-
-    int getWarehouseID() { return warehouseID; }
+    Warehouse() : Entity() { location = ""; capacity = 0; }
+    void setLocation(string l) { location = l; }
+    void setCapacity(int c) { capacity = c; }
     string getLocation() { return location; }
-    int getTotalCapacity() { return totalCapacity; }
-    int getAvailableSpace() { return availableSpace; }
-
-    void allocateSpace(int space) {
-        availableSpace -= space;
-    }
-
-    void removeProduct(int space) {
-        availableSpace += space;
-    }
+    int getCapacity() { return capacity; }
 
     void display() {
-        cout << "Warehouse ID: " << warehouseID << endl;
+        cout << "========== WAREHOUSE DETAILS ==========" << endl;
+        displayEntity();
         cout << "Location: " << location << endl;
-        cout << "Total Capacity: " << totalCapacity << endl;
-        cout << "Available Space: " << availableSpace << endl;
+        cout << "Capacity: " << capacity << endl;
+        cout << "=======================================" << endl;
     }
 };
 
-class Inventory {
-private:
-    int inventoryID;
-    string productList;
-    int totalItems;
-    string lastUpdatedDate;
+class Inventory : public Warehouse {
+protected:
+    int itemID;
+    string itemName;
+    int quantity;
+    double price;
+    string description;
 
 public:
-    Inventory() {
-        inventoryID = 0;
-        productList = "";
-        totalItems = 0;
-        lastUpdatedDate = "";
+    Inventory() : Warehouse() {
+        itemID = 0; itemName = ""; quantity = 0; price = 0.0; description = "";
     }
-
-    Inventory(int id, string list, int items, string date) {
-        inventoryID = id;
-        productList = list;
-        totalItems = items;
-        lastUpdatedDate = date;
-    }
-
-    void setInventoryID(int id) { inventoryID = id; }
-    void setProductList(string list) { productList = list; }
-    void setTotalItems(int items) { totalItems = items; }
-    void setDate(string date) { lastUpdatedDate = date; }
-
-    int getInventoryID() { return inventoryID; }
-    string getProductList() { return productList; }
-    int getTotalItems() { return totalItems; }
-    string getDate() { return lastUpdatedDate; }
-
-    void updateQuantity(int q) {
-        totalItems += q;
-    }
+    void setItemID(int id) { itemID = id; }
+    void setItemName(string n) { itemName = n; }
+    void setQuantity(int q) { quantity = q; }
+    void setPrice(double p) { price = p; }
+    void setDescription(string d) { description = d; }
+    int getItemID() { return itemID; }
+    string getItemName() { return itemName; }
+    int getQuantity() { return quantity; }
+    double getPrice() { return price; }
+    string getDescription() { return description; }
 
     void display() {
-        cout << "Inventory ID: " << inventoryID << endl;
-        cout << "Products: " << productList << endl;
-        cout << "Total Items: " << totalItems << endl;
-        cout << "Last Updated: " << lastUpdatedDate << endl;
+        cout << "========== INVENTORY ITEM ==========" << endl;
+        displayEntity();
+        cout << "Location: " << location << endl;
+        cout << "Item ID: " << itemID << endl;
+        cout << "Item Name: " << itemName << endl;
+        cout << "Price: $" << price << endl;
+        cout << "Quantity: " << quantity << endl;
+        cout << "Description: " << description << endl;
+        cout << "====================================" << endl;
     }
 };
 
-class Shipment {
+class Shipment : public Inventory {
 private:
     int shipmentID;
-    int orderID;
-    string shipmentDate;
-    string deliveryDate;
-    string deliveryStatus;
+    string status;
 
 public:
-    Shipment() {
-        shipmentID = 0;
-        orderID = 0;
-        shipmentDate = "";
-        deliveryDate = "";
-        deliveryStatus = "Pending";
-    }
-
-    Shipment(int id, int oid, string sDate, string dDate, string status) {
-        shipmentID = id;
-        orderID = oid;
-        shipmentDate = sDate;
-        deliveryDate = dDate;
-        deliveryStatus = status;
-    }
-
+    Shipment() : Inventory() { shipmentID = 0; status = "Pending"; }
     void setShipmentID(int id) { shipmentID = id; }
-    void setOrderID(int oid) { orderID = oid; }
-    void setShipmentDate(string d) { shipmentDate = d; }
-    void setDeliveryDate(string d) { deliveryDate = d; }
-    void setStatus(string s) { deliveryStatus = s; }
-
+    void setStatus(string s) { status = s; }
     int getShipmentID() { return shipmentID; }
-    int getOrderID() { return orderID; }
-    string getShipmentDate() { return shipmentDate; }
-    string getDeliveryDate() { return deliveryDate; }
-    string getStatus() { return deliveryStatus; }
-
-    void confirmDelivery() {
-        deliveryStatus = "Delivered";
-    }
+    string getStatus() { return status; }
 
     void display() {
+        cout << "========== SHIPMENT DETAILS ==========" << endl;
         cout << "Shipment ID: " << shipmentID << endl;
-        cout << "Order ID: " << orderID << endl;
-        cout << "Shipment Date: " << shipmentDate << endl;
-        cout << "Delivery Date: " << deliveryDate << endl;
-        cout << "Status: " << deliveryStatus << endl;
+        displayEntity();
+        cout << "Item: " << itemName << endl;
+        cout << "Quantity: " << quantity << endl;
+        cout << "Status: " << status << endl;
+        cout << "=====================================" << endl;
     }
 };
 
-vector<Customer> customers;
-vector<Product> products;
-vector<Order> orders;
-vector<Category> categories;
-vector<Supplier> suppliers;
-vector<Employee> employees;
-vector<Warehouse> warehouses;
-vector<Inventory> inventories;
-vector<Shipment> shipments;
+class CustomerCollection {
+private:
+    Customer customers[100];
+    int count;
+
+public:
+    CustomerCollection() {
+        count = 0;
+    }
+
+    void Add(Customer c) {
+        if (count < 100) {
+            customers[count] = c;
+            count++;
+            cout << "Customer added successfully! (Total: " << count << ")" << endl;
+        } else {
+            cout << "Collection is full!" << endl;
+        }
+    }
+
+    void Remove(int id) {
+        int index = FindByID(id);
+        if (index != -1) {
+            for (int i = index; i < count - 1; i++) {
+                customers[i] = customers[i + 1];
+            }
+            count--;
+            cout << "Customer removed successfully!" << endl;
+        } else {
+            cout << "Customer not found!" << endl;
+        }
+    }
+
+    void Update(int id) {
+        int index = FindByID(id);
+        if (index != -1) {
+            Customer c;
+            int cid;
+            string name, contact, email, addr;
+            cout << "Enter new Customer ID: ";
+            cin >> cid;
+            clearInputBuffer();
+            name = getStringInput("Enter new Name: ");
+            contact = getStringInput("Enter new Contact: ");
+            email = getStringInput("Enter new Email: ");
+            addr = getStringInput("Enter new Address: ");
+            c.setID(cid);
+            c.setName(name);
+            c.setContact(contact);
+            c.setEmail(email);
+            c.setAddress(addr);
+            customers[index] = c;
+            cout << "Customer updated successfully!" << endl;
+        } else {
+            cout << "Customer not found!" << endl;
+        }
+    }
+
+    void DisplayAll() {
+        if (count == 0) {
+            cout << "No customers in collection!" << endl;
+            return;
+        }
+        cout << "\n========== ALL CUSTOMERS ==========" << endl;
+        for (int i = 0; i < count; i++) {
+            customers[i].display();
+            cout << endl;
+        }
+    }
+
+    int FindByID(int id) {
+        for (int i = 0; i < count; i++) {
+            if (customers[i].getID() == id) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    Customer* GetCustomer(int id) {
+        int index = FindByID(id);
+        if (index != -1) {
+            return &customers[index];
+        }
+        return NULL;
+    }
+
+    int getCount() { return count; }
+};
+
+class ProductCollection {
+private:
+    Product products[100];
+    int count;
+
+public:
+    ProductCollection() {
+        count = 0;
+    }
+
+    void Add(Product p) {
+        if (count < 100) {
+            products[count] = p;
+            count++;
+            cout << "Product added successfully! (Total: " << count << ")" << endl;
+        } else {
+            cout << "Collection is full!" << endl;
+        }
+    }
+
+    void Remove(int id) {
+        int index = FindByID(id);
+        if (index != -1) {
+            for (int i = index; i < count - 1; i++) {
+                products[i] = products[i + 1];
+            }
+            count--;
+            cout << "Product removed successfully!" << endl;
+        } else {
+            cout << "Product not found!" << endl;
+        }
+    }
+
+    void Update(int id) {
+        int index = FindByID(id);
+        if (index != -1) {
+            Product p;
+            int pid, catId, qty;
+            string name, desc;
+            float price;
+            cout << "Enter new Product ID: ";
+            cin >> pid;
+            clearInputBuffer();
+            name = getStringInput("Enter new Name: ");
+            cout << "Enter new Category ID: ";
+            cin >> catId;
+            cout << "Enter new Price: ";
+            cin >> price;
+            cout << "Enter new Quantity: ";
+            cin >> qty;
+            clearInputBuffer();
+            desc = getStringInput("Enter new Description: ");
+            p.setProductID(pid);
+            p.setProductName(name);
+            p.setCategoryID(catId);
+            p.setPrice(price);
+            p.setQuantity(qty);
+            p.setDescription(desc);
+            products[index] = p;
+            cout << "Product updated successfully!" << endl;
+        } else {
+            cout << "Product not found!" << endl;
+        }
+    }
+
+    void DisplayAll() {
+        if (count == 0) {
+            cout << "No products in collection!" << endl;
+            return;
+        }
+        cout << "\n========== ALL PRODUCTS ==========" << endl;
+        for (int i = 0; i < count; i++) {
+            products[i].display();
+        }
+        cout << "=================================" << endl;
+    }
+
+    int FindByID(int id) {
+        for (int i = 0; i < count; i++) {
+            if (products[i].getProductID() == id) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    Product* GetProduct(int id) {
+        int index = FindByID(id);
+        if (index != -1) {
+            return &products[index];
+        }
+        return NULL;
+    }
+
+    int getCount() { return count; }
+};
+
+class OrderCollection {
+private:
+    Order orders[100];
+    int count;
+
+public:
+    OrderCollection() {
+        count = 0;
+    }
+
+    void Add(Order o) {
+        if (count < 100) {
+            orders[count] = o;
+            count++;
+            cout << "Order added successfully! (Total: " << count << ")" << endl;
+        } else {
+            cout << "Collection is full!" << endl;
+        }
+    }
+
+    void Remove(int id) {
+        int index = FindByID(id);
+        if (index != -1) {
+            for (int i = index; i < count - 1; i++) {
+                orders[i] = orders[i + 1];
+            }
+            count--;
+            cout << "Order removed successfully!" << endl;
+        } else {
+            cout << "Order not found!" << endl;
+        }
+    }
+
+    void Update(int id) {
+        int index = FindByID(id);
+        if (index != -1) {
+            string status;
+            cout << "Enter new status: ";
+            cin >> status;
+            orders[index].setOrderStatus(status);
+            cout << "Order updated successfully!" << endl;
+        } else {
+            cout << "Order not found!" << endl;
+        }
+    }
+
+    void DisplayAll() {
+        if (count == 0) {
+            cout << "No orders in collection!" << endl;
+            return;
+        }
+        cout << "\n========== ALL ORDERS ==========" << endl;
+        for (int i = 0; i < count; i++) {
+            orders[i].display();
+        }
+        cout << "===============================" << endl;
+    }
+
+    int FindByID(int id) {
+        for (int i = 0; i < count; i++) {
+            if (orders[i].getOrderID() == id) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    Order* GetOrder(int id) {
+        int index = FindByID(id);
+        if (index != -1) {
+            return &orders[index];
+        }
+        return NULL;
+    }
+
+    int getCount() { return count; }
+};
+
+class EmployeeCollection {
+private:
+    Employee employees[100];
+    int count;
+
+public:
+    EmployeeCollection() { count = 0; }
+
+    void Add(Employee e) {
+        if (count < 100) {
+            employees[count] = e;
+            count++;
+            cout << "Employee added successfully! (Total: " << count << ")" << endl;
+        } else {
+            cout << "Collection is full!" << endl;
+        }
+    }
+
+    void Remove(int id) {
+        int index = FindByID(id);
+        if (index != -1) {
+            for (int i = index; i < count - 1; i++) {
+                employees[i] = employees[i + 1];
+            }
+            count--;
+            cout << "Employee removed successfully!" << endl;
+        } else {
+            cout << "Employee not found!" << endl;
+        }
+    }
+
+    void Update(int id) {
+        int index = FindByID(id);
+        if (index != -1) {
+            Employee e;
+            int eid;
+            string name, contact, email, position, city;
+            cout << "Enter new Employee ID: ";
+            cin >> eid;
+            clearInputBuffer();
+            name = getStringInput("Enter new Name: ");
+            contact = getStringInput("Enter new Contact: ");
+            email = getStringInput("Enter new Email: ");
+            position = getStringInput("Enter new Position: ");
+            city = getStringInput("Enter new City: ");
+            e.setID(eid);
+            e.setName(name);
+            e.setContact(contact);
+            e.setEmail(email);
+            e.setPosition(position);
+            e.setCity(city);
+            employees[index] = e;
+            cout << "Employee updated successfully!" << endl;
+        } else {
+            cout << "Employee not found!" << endl;
+        }
+    }
+
+    void DisplayAll() {
+        if (count == 0) {
+            cout << "No employees in collection!" << endl;
+            return;
+        }
+        cout << "\n========== ALL EMPLOYEES ==========" << endl;
+        for (int i = 0; i < count; i++) {
+            employees[i].display();
+            cout << endl;
+        }
+    }
+
+    int FindByID(int id) {
+        for (int i = 0; i < count; i++) {
+            if (employees[i].getID() == id) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    Employee* GetEmployee(int id) {
+        int index = FindByID(id);
+        if (index != -1) {
+            return &employees[index];
+        }
+        return NULL;
+    }
+
+    int getCount() { return count; }
+};
+
+class SupplierCollection {
+private:
+    Supplier suppliers[100];
+    int count;
+
+public:
+    SupplierCollection() { count = 0; }
+
+    void Add(Supplier s) {
+        if (count < 100) {
+            suppliers[count] = s;
+            count++;
+            cout << "Supplier added successfully! (Total: " << count << ")" << endl;
+        } else {
+            cout << "Collection is full!" << endl;
+        }
+    }
+
+    void Remove(int id) {
+        int index = FindByID(id);
+        if (index != -1) {
+            for (int i = index; i < count - 1; i++) {
+                suppliers[i] = suppliers[i + 1];
+            }
+            count--;
+            cout << "Supplier removed successfully!" << endl;
+        } else {
+            cout << "Supplier not found!" << endl;
+        }
+    }
+
+    void Update(int id) {
+        int index = FindByID(id);
+        if (index != -1) {
+            Supplier s;
+            int sid;
+            string name, contact, email, company, city;
+            cout << "Enter new Supplier ID: ";
+            cin >> sid;
+            clearInputBuffer();
+            name = getStringInput("Enter new Name: ");
+            contact = getStringInput("Enter new Contact: ");
+            email = getStringInput("Enter new Email: ");
+            company = getStringInput("Enter new Company: ");
+            city = getStringInput("Enter new City: ");
+            s.setID(sid);
+            s.setName(name);
+            s.setContact(contact);
+            s.setEmail(email);
+            s.setCompanyName(company);
+            Address* addr = new Address();
+            addr->setCity(city);
+            s.setAddress(addr);
+            suppliers[index] = s;
+            cout << "Supplier updated successfully!" << endl;
+        } else {
+            cout << "Supplier not found!" << endl;
+        }
+    }
+
+    void DisplayAll() {
+        if (count == 0) {
+            cout << "No suppliers in collection!" << endl;
+            return;
+        }
+        cout << "\n========== ALL SUPPLIERS ==========" << endl;
+        for (int i = 0; i < count; i++) {
+            suppliers[i].display();
+            cout << endl;
+        }
+    }
+
+    int FindByID(int id) {
+        for (int i = 0; i < count; i++) {
+            if (suppliers[i].getID() == id) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    Supplier* GetSupplier(int id) {
+        int index = FindByID(id);
+        if (index != -1) {
+            return &suppliers[index];
+        }
+        return NULL;
+    }
+
+    int getCount() { return count; }
+};
+
+class CategoryCollection {
+private:
+    Category categories[100];
+    int count;
+
+public:
+    CategoryCollection() { count = 0; }
+
+    void Add(Category c) {
+        if (count < 100) {
+            categories[count] = c;
+            count++;
+            cout << "Category added successfully! (Total: " << count << ")" << endl;
+        } else {
+            cout << "Collection is full!" << endl;
+        }
+    }
+
+    void Remove(int id) {
+        int index = FindByID(id);
+        if (index != -1) {
+            for (int i = index; i < count - 1; i++) {
+                categories[i] = categories[i + 1];
+            }
+            count--;
+            cout << "Category removed successfully!" << endl;
+        } else {
+            cout << "Category not found!" << endl;
+        }
+    }
+
+    void Update(int id) {
+        int index = FindByID(id);
+        if (index != -1) {
+            Category c;
+            int cid;
+            string name, desc;
+            cout << "Enter new Category ID: ";
+            cin >> cid;
+            clearInputBuffer();
+            name = getStringInput("Enter new Name: ");
+            desc = getStringInput("Enter new Description: ");
+            c.setCategoryID(cid);
+            c.setCategoryName(name);
+            c.setDescription(desc);
+            categories[index] = c;
+            cout << "Category updated successfully!" << endl;
+        } else {
+            cout << "Category not found!" << endl;
+        }
+    }
+
+    void DisplayAll() {
+        if (count == 0) {
+            cout << "No categories in collection!" << endl;
+            return;
+        }
+        cout << "\n========== ALL CATEGORIES ==========" << endl;
+        for (int i = 0; i < count; i++) {
+            categories[i].display();
+        }
+        cout << "===================================" << endl;
+    }
+
+    int FindByID(int id) {
+        for (int i = 0; i < count; i++) {
+            if (categories[i].getCategoryID() == id) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    Category* GetCategory(int id) {
+        int index = FindByID(id);
+        if (index != -1) {
+            return &categories[index];
+        }
+        return NULL;
+    }
+
+    int getCount() { return count; }
+};
+
+class WarehouseCollection {
+private:
+    Warehouse warehouses[100];
+    int count;
+
+public:
+    WarehouseCollection() { count = 0; }
+
+    void Add(Warehouse w) {
+        if (count < 100) {
+            warehouses[count] = w;
+            count++;
+            cout << "Warehouse added successfully! (Total: " << count << ")" << endl;
+        } else {
+            cout << "Collection is full!" << endl;
+        }
+    }
+
+    void Remove(int id) {
+        int index = FindByID(id);
+        if (index != -1) {
+            for (int i = index; i < count - 1; i++) {
+                warehouses[i] = warehouses[i + 1];
+            }
+            count--;
+            cout << "Warehouse removed successfully!" << endl;
+        } else {
+            cout << "Warehouse not found!" << endl;
+        }
+    }
+
+    void Update(int id) {
+        int index = FindByID(id);
+        if (index != -1) {
+            Warehouse w;
+            int wid, cap;
+            string name, location;
+            cout << "Enter new Warehouse ID: ";
+            cin >> wid;
+            clearInputBuffer();
+            name = getStringInput("Enter new Name: ");
+            location = getStringInput("Enter new Location: ");
+            cout << "Enter new Capacity: ";
+            cin >> cap;
+            clearInputBuffer();
+            w.setID(wid);
+            w.setName(name);
+            w.setLocation(location);
+            w.setCapacity(cap);
+            warehouses[index] = w;
+            cout << "Warehouse updated successfully!" << endl;
+        } else {
+            cout << "Warehouse not found!" << endl;
+        }
+    }
+
+    void DisplayAll() {
+        if (count == 0) {
+            cout << "No warehouses in collection!" << endl;
+            return;
+        }
+        cout << "\n========== ALL WAREHOUSES ==========" << endl;
+        for (int i = 0; i < count; i++) {
+            warehouses[i].display();
+            cout << endl;
+        }
+    }
+
+    int FindByID(int id) {
+        for (int i = 0; i < count; i++) {
+            if (warehouses[i].getID() == id) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    Warehouse* GetWarehouse(int id) {
+        int index = FindByID(id);
+        if (index != -1) {
+            return &warehouses[index];
+        }
+        return NULL;
+    }
+
+    int getCount() { return count; }
+};
+
+class InventoryCollection {
+private:
+    Inventory inventoryItems[100];
+    int count;
+
+public:
+    InventoryCollection() { count = 0; }
+
+    void Add(Inventory inv) {
+        if (count < 100) {
+            inventoryItems[count] = inv;
+            count++;
+            cout << "Inventory item added successfully! (Total: " << count << ")" << endl;
+        } else {
+            cout << "Collection is full!" << endl;
+        }
+    }
+
+    void Remove(int itemID) {
+        int index = FindByID(itemID);
+        if (index != -1) {
+            for (int i = index; i < count - 1; i++) {
+                inventoryItems[i] = inventoryItems[i + 1];
+            }
+            count--;
+            cout << "Inventory item removed successfully!" << endl;
+        } else {
+            cout << "Inventory item not found!" << endl;
+        }
+    }
+
+    void Update(int itemID) {
+        int index = FindByID(itemID);
+        if (index != -1) {
+            Inventory inv;
+            int wid, cap, iid, qty;
+            string wname, location, iname, desc;
+            double price;
+            cout << "Enter new Warehouse ID: ";
+            cin >> wid;
+            clearInputBuffer();
+            wname = getStringInput("Enter new Warehouse Name: ");
+            location = getStringInput("Enter new Location: ");
+            cout << "Enter new Capacity: ";
+            cin >> cap;
+            clearInputBuffer();
+            cout << "Enter new Item ID: ";
+            cin >> iid;
+            clearInputBuffer();
+            iname = getStringInput("Enter new Item Name: ");
+            cout << "Enter new Price: ";
+            cin >> price;
+            clearInputBuffer();
+            cout << "Enter new Quantity: ";
+            cin >> qty;
+            clearInputBuffer();
+            desc = getStringInput("Enter new Description: ");
+            inv.setID(wid);
+            inv.setName(wname);
+            inv.setLocation(location);
+            inv.setCapacity(cap);
+            inv.setItemID(iid);
+            inv.setItemName(iname);
+            inv.setPrice(price);
+            inv.setQuantity(qty);
+            inv.setDescription(desc);
+            inventoryItems[index] = inv;
+            cout << "Inventory updated successfully!" << endl;
+        } else {
+            cout << "Inventory item not found!" << endl;
+        }
+    }
+
+    void DisplayAll() {
+        if (count == 0) {
+            cout << "No inventory items in collection!" << endl;
+            return;
+        }
+        cout << "\n========== ALL INVENTORY ITEMS ==========" << endl;
+        for (int i = 0; i < count; i++) {
+            inventoryItems[i].display();
+            cout << endl;
+        }
+    }
+
+    int FindByID(int itemID) {
+        for (int i = 0; i < count; i++) {
+            if (inventoryItems[i].getItemID() == itemID) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    Inventory* GetInventory(int itemID) {
+        int index = FindByID(itemID);
+        if (index != -1) {
+            return &inventoryItems[index];
+        }
+        return NULL;
+    }
+
+    int getCount() { return count; }
+};
+
+class ShipmentCollection {
+private:
+    Shipment shipments[100];
+    int count;
+
+public:
+    ShipmentCollection() { count = 0; }
+
+    void Add(Shipment ship) {
+        if (count < 100) {
+            shipments[count] = ship;
+            count++;
+            cout << "Shipment added successfully! (Total: " << count << ")" << endl;
+        } else {
+            cout << "Collection is full!" << endl;
+        }
+    }
+
+    void Remove(int shipmentID) {
+        int index = FindByID(shipmentID);
+        if (index != -1) {
+            for (int i = index; i < count - 1; i++) {
+                shipments[i] = shipments[i + 1];
+            }
+            count--;
+            cout << "Shipment removed successfully!" << endl;
+        } else {
+            cout << "Shipment not found!" << endl;
+        }
+    }
+
+    void Update(int shipmentID) {
+        int index = FindByID(shipmentID);
+        if (index != -1) {
+            Shipment ship;
+            int sid, wid, cap, iid, qty;
+            string wname, location, iname, status;
+            double price;
+            cout << "Enter new Shipment ID: ";
+            cin >> sid;
+            clearInputBuffer();
+            cout << "Enter new Warehouse ID: ";
+            cin >> wid;
+            clearInputBuffer();
+            wname = getStringInput("Enter new Warehouse Name: ");
+            location = getStringInput("Enter new Location: ");
+            cout << "Enter new Capacity: ";
+            cin >> cap;
+            clearInputBuffer();
+            cout << "Enter new Item ID: ";
+            cin >> iid;
+            clearInputBuffer();
+            iname = getStringInput("Enter new Item Name: ");
+            cout << "Enter new Price: ";
+            cin >> price;
+            clearInputBuffer();
+            cout << "Enter new Quantity: ";
+            cin >> qty;
+            clearInputBuffer();
+            status = getStringInput("Enter new Status: ");
+            ship.setShipmentID(sid);
+            ship.setID(wid);
+            ship.setName(wname);
+            ship.setLocation(location);
+            ship.setCapacity(cap);
+            ship.setItemID(iid);
+            ship.setItemName(iname);
+            ship.setPrice(price);
+            ship.setQuantity(qty);
+            ship.setStatus(status);
+            shipments[index] = ship;
+            cout << "Shipment updated successfully!" << endl;
+        } else {
+            cout << "Shipment not found!" << endl;
+        }
+    }
+
+    void DisplayAll() {
+        if (count == 0) {
+            cout << "No shipments in collection!" << endl;
+            return;
+        }
+        cout << "\n========== ALL SHIPMENTS ==========" << endl;
+        for (int i = 0; i < count; i++) {
+            shipments[i].display();
+            cout << endl;
+        }
+    }
+
+    int FindByID(int shipmentID) {
+        for (int i = 0; i < count; i++) {
+            if (shipments[i].getShipmentID() == shipmentID) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    Shipment* GetShipment(int shipmentID) {
+        int index = FindByID(shipmentID);
+        if (index != -1) {
+            return &shipments[index];
+        }
+        return NULL;
+    }
+
+    int getCount() { return count; }
+};
+
+CustomerCollection customers;
+ProductCollection products;
+OrderCollection orders;
+EmployeeCollection employees;
+SupplierCollection suppliers;
+CategoryCollection categories;
+WarehouseCollection warehouses;
+InventoryCollection inventoryItems;
+ShipmentCollection shipments;
 
 void customerMenu() {
     int choice;
     int id;
     string name, contact, email, addr;
+    Customer c;
 
     do {
         cout << "\n========================================\n";
         cout << "        CUSTOMER MANAGEMENT MENU\n";
         cout << "========================================\n";
         cout << "1. Add Customer\n";
-        cout << "2. Update Customer\n";
-        cout << "3. Display All Customers\n";
-        cout << "4. Find Customer by ID\n";
-        cout << "5. Delete Customer\n";
+        cout << "2. Remove Customer\n";
+        cout << "3. Update Customer\n";
+        cout << "4. Search Customer\n";
+        cout << "5. Display All Customers\n";
         cout << "6. Back to Main Menu\n";
         cout << "Enter your choice: ";
         if (!(cin >> choice)) {
@@ -416,92 +1248,47 @@ void customerMenu() {
             cout << "\n--- Add Customer ---\n";
             cout << "Enter Customer ID: ";
             cin >> id;
-            cout << "Enter Name: ";
-            cin >> name;
-            cout << "Enter Contact Number: ";
-            cin >> contact;
-            cout << "Enter Email: ";
-            cin >> email;
-            cout << "Enter Address: ";
-            cin >> addr;
-            customers.push_back(Customer(id, name, contact, email, addr));
-            cout << "Customer added successfully!" << endl;
+            clearInputBuffer();
+            name = getStringInput("Enter Name: ");
+            contact = getStringInput("Enter Contact: ");
+            email = getStringInput("Enter Email: ");
+            addr = getStringInput("Enter Address: ");
+            c.setID(id);
+            c.setName(name);
+            c.setContact(contact);
+            c.setEmail(email);
+            c.setAddress(addr);
+            cout << "\n--- Customer Information ---\n";
+            c.display();
+            customers.Add(c);
             break;
         case 2:
+            cout << "\n--- Remove Customer ---\n";
+            cout << "Enter Customer ID to remove: ";
+            cin >> id;
+            customers.Remove(id);
+            break;
+        case 3:
             cout << "\n--- Update Customer ---\n";
             cout << "Enter Customer ID to update: ";
             cin >> id;
-            {
-                bool found = false;
-                for (int i = 0; i < customers.size(); i++) {
-                    if (customers[i].getCustomerID() == id) {
-                        cout << "Enter new Name: ";
-                        cin >> name;
-                        cout << "Enter new Contact Number: ";
-                        cin >> contact;
-                        cout << "Enter new Email: ";
-                        cin >> email;
-                        cout << "Enter new Address: ";
-                        cin >> addr;
-                        customers[i].setCustomerName(name);
-                        customers[i].setContactNumber(contact);
-                        customers[i].setEmail(email);
-                        customers[i].setAddress(addr);
-                        cout << "Customer updated successfully!" << endl;
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    cout << "Customer not found!" << endl;
-                }
-            }
-            break;
-        case 3:
-            cout << "\n--- All Customers ---\n";
-            if (customers.empty()) {
-                cout << "No customers found." << endl;
-            } else {
-                for (int i = 0; i < customers.size(); i++) {
-                    customers[i].display();
-                    cout << "-----------------------------------\n";
-                }
-            }
+            customers.Update(id);
             break;
         case 4:
-            cout << "Enter Customer ID to find: ";
+            cout << "\n--- Search Customer ---\n";
+            cout << "Enter Customer ID to search: ";
             cin >> id;
             {
-                bool found = false;
-                for (int i = 0; i < customers.size(); i++) {
-                    if (customers[i].getCustomerID() == id) {
-                        customers[i].display();
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
+                Customer* c = customers.GetCustomer(id);
+                if (c != NULL) {
+                    c->display();
+                } else {
                     cout << "Customer not found!" << endl;
                 }
             }
             break;
         case 5:
-            cout << "Enter Customer ID to delete: ";
-            cin >> id;
-            {
-                bool found = false;
-                for (int i = 0; i < customers.size(); i++) {
-                    if (customers[i].getCustomerID() == id) {
-                        customers.erase(customers.begin() + i);
-                        cout << "Customer deleted successfully!" << endl;
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    cout << "Customer not found!" << endl;
-                }
-            }
+            customers.DisplayAll();
             break;
         case 6:
             cout << "Returning to Main Menu...\n";
@@ -517,16 +1304,17 @@ void productMenu() {
     int id, catId, qty;
     string name, desc;
     float price;
+    Product p;
 
     do {
         cout << "\n========================================\n";
         cout << "        PRODUCT MANAGEMENT MENU\n";
         cout << "========================================\n";
         cout << "1. Add Product\n";
-        cout << "2. Update Product\n";
-        cout << "3. Delete Product\n";
-        cout << "4. Display All Products\n";
-        cout << "5. Update Stock\n";
+        cout << "2. Remove Product\n";
+        cout << "3. Update Product\n";
+        cout << "4. Search Product\n";
+        cout << "5. Display All Products\n";
         cout << "6. Back to Main Menu\n";
         cout << "Enter your choice: ";
         if (!(cin >> choice)) {
@@ -540,100 +1328,53 @@ void productMenu() {
             cout << "\n--- Add Product ---\n";
             cout << "Enter Product ID: ";
             cin >> id;
-            cout << "Enter Product Name: ";
-            cin >> name;
+            clearInputBuffer();
+            name = getStringInput("Enter Name: ");
             cout << "Enter Category ID: ";
             cin >> catId;
             cout << "Enter Price: ";
             cin >> price;
             cout << "Enter Quantity: ";
             cin >> qty;
-            cout << "Enter Description: ";
-            cin >> desc;
-            products.push_back(Product(id, name, catId, price, qty, desc));
-            cout << "Product added successfully!" << endl;
+            clearInputBuffer();
+            desc = getStringInput("Enter Description: ");
+            p.setProductID(id);
+            p.setProductName(name);
+            p.setCategoryID(catId);
+            p.setPrice(price);
+            p.setQuantity(qty);
+            p.setDescription(desc);
+            cout << "\n--- Product Information ---\n";
+            p.displayDetails();
+            products.Add(p);
             break;
         case 2:
+            cout << "\n--- Remove Product ---\n";
+            cout << "Enter Product ID to remove: ";
+            cin >> id;
+            products.Remove(id);
+            break;
+        case 3:
             cout << "\n--- Update Product ---\n";
             cout << "Enter Product ID to update: ";
             cin >> id;
-            {
-                bool found = false;
-                for (int i = 0; i < products.size(); i++) {
-                    if (products[i].getProductID() == id) {
-                        cout << "Enter new Product Name: ";
-                        cin >> name;
-                        cout << "Enter new Category ID: ";
-                        cin >> catId;
-                        cout << "Enter new Price: ";
-                        cin >> price;
-                        cout << "Enter new Quantity: ";
-                        cin >> qty;
-                        cout << "Enter new Description: ";
-                        cin >> desc;
-                        products[i].setProductName(name);
-                        products[i].setCategoryID(catId);
-                        products[i].setPrice(price);
-                        products[i].setQuantity(qty);
-                        products[i].setDescription(desc);
-                        cout << "Product updated successfully!" << endl;
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    cout << "Product not found!" << endl;
-                }
-            }
-            break;
-        case 3:
-            cout << "Enter Product ID to delete: ";
-            cin >> id;
-            {
-                bool found = false;
-                for (int i = 0; i < products.size(); i++) {
-                    if (products[i].getProductID() == id) {
-                        products.erase(products.begin() + i);
-                        cout << "Product deleted successfully!" << endl;
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    cout << "Product not found!" << endl;
-                }
-            }
+            products.Update(id);
             break;
         case 4:
-            cout << "\n--- All Products ---\n";
-            if (products.empty()) {
-                cout << "No products found." << endl;
-            } else {
-                for (int i = 0; i < products.size(); i++) {
-                    products[i].display();
-                    cout << "-----------------------------------\n";
+            cout << "\n--- Search Product ---\n";
+            cout << "Enter Product ID to search: ";
+            cin >> id;
+            {
+                Product* p = products.GetProduct(id);
+                if (p != NULL) {
+                    p->displayDetails();
+                } else {
+                    cout << "Product not found!" << endl;
                 }
             }
             break;
         case 5:
-            cout << "Enter Product ID to update stock: ";
-            cin >> id;
-            cout << "Enter quantity change (positive to add, negative to reduce): ";
-            cin >> qty;
-            {
-                bool found = false;
-                for (int i = 0; i < products.size(); i++) {
-                    if (products[i].getProductID() == id) {
-                        products[i].updateStock(qty);
-                        cout << "Stock updated. New quantity: " << products[i].getQuantity() << endl;
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    cout << "Product not found!" << endl;
-                }
-            }
+            products.DisplayAll();
             break;
         case 6:
             cout << "Returning to Main Menu...\n";
@@ -646,20 +1387,19 @@ void productMenu() {
 
 void orderMenu() {
     int choice;
-    int id, custId, count, prodId;
+    int id, custId, count;
     string date;
-    float price, total = 0;
-    vector<int> prods;
+    Order o;
 
     do {
         cout << "\n========================================\n";
         cout << "        ORDER MANAGEMENT MENU\n";
         cout << "========================================\n";
         cout << "1. Create Order\n";
-        cout << "2. Display All Orders\n";
+        cout << "2. Remove Order\n";
         cout << "3. Update Order Status\n";
-        cout << "4. Cancel Order\n";
-        cout << "5. Calculate Order Total\n";
+        cout << "4. Search Order\n";
+        cout << "5. Display All Orders\n";
         cout << "6. Back to Main Menu\n";
         cout << "Enter your choice: ";
         if (!(cin >> choice)) {
@@ -677,83 +1417,219 @@ void orderMenu() {
             cin >> date;
             cout << "Enter Customer ID: ";
             cin >> custId;
-            cout << "Enter number of products: ";
+            cout << "How many products in this order? ";
             cin >> count;
-            prods.clear();
+            o.setOrderID(id);
+            o.setOrderDate(date);
+            o.setCustomerID(custId);
             for (int i = 0; i < count; i++) {
+                int pid;
                 cout << "Enter Product ID " << i + 1 << ": ";
-                cin >> prodId;
-                prods.push_back(prodId);
+                cin >> pid;
+                Product* p = products.GetProduct(pid);
+                if (p != NULL) {
+                    o.addProduct(*p);
+                } else {
+                    cout << "Product not found! Skipping..." << endl;
+                }
             }
-            orders.push_back(Order(id, date, custId, prods, 0));
-            cout << "Order created successfully!" << endl;
+            orders.Add(o);
+            cout << "\n--- Order Created ---\n";
+            o.displayDetails();
             break;
         case 2:
-            cout << "\n--- All Orders ---\n";
-            if (orders.empty()) {
-                cout << "No orders found." << endl;
-            } else {
-                for (int i = 0; i < orders.size(); i++) {
-                    orders[i].display();
-                }
-            }
+            cout << "\n--- Remove Order ---\n";
+            cout << "Enter Order ID to remove: ";
+            cin >> id;
+            orders.Remove(id);
             break;
         case 3:
-            cout << "Enter Order ID: ";
+            cout << "\n--- Update Order Status ---\n";
+            cout << "Enter Order ID to update: ";
             cin >> id;
-            cout << "Enter new status: ";
-            cin >> date;
-            {
-                bool found = false;
-                for (int i = 0; i < orders.size(); i++) {
-                    if (orders[i].getOrderID() == id) {
-                        orders[i].updateOrderStatus(date);
-                        cout << "Order status updated!" << endl;
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    cout << "Order not found!" << endl;
-                }
-            }
+            orders.Update(id);
             break;
         case 4:
-            cout << "Enter Order ID to cancel: ";
+            cout << "\n--- Search Order ---\n";
+            cout << "Enter Order ID to search: ";
             cin >> id;
             {
-                bool found = false;
-                for (int i = 0; i < orders.size(); i++) {
-                    if (orders[i].getOrderID() == id) {
-                        orders[i].cancelOrder();
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
+                Order* o = orders.GetOrder(id);
+                if (o != NULL) {
+                    o->displayDetails();
+                } else {
                     cout << "Order not found!" << endl;
                 }
             }
             break;
         case 5:
-            cout << "Enter Order ID: ";
+            orders.DisplayAll();
+            break;
+        case 6:
+            cout << "Returning to Main Menu...\n";
+            break;
+        default:
+            cout << "Invalid choice!\n";
+        }
+    } while (choice != 6);
+}
+
+void employeeMenu() {
+    int choice;
+    int id;
+    string name, contact, email, position, city;
+    Employee e;
+
+    do {
+        cout << "\n========================================\n";
+        cout << "        EMPLOYEE MANAGEMENT MENU\n";
+        cout << "========================================\n";
+        cout << "1. Add Employee\n";
+        cout << "2. Remove Employee\n";
+        cout << "3. Update Employee\n";
+        cout << "4. Search Employee\n";
+        cout << "5. Display All Employees\n";
+        cout << "6. Back to Main Menu\n";
+        cout << "Enter your choice: ";
+        if (!(cin >> choice)) {
+            clearInputBuffer();
+            cout << "Invalid input! Please enter a number.\n";
+            continue;
+        }
+
+        switch (choice) {
+        case 1:
+            cout << "\n--- Add Employee ---\n";
+            cout << "Enter Employee ID: ";
             cin >> id;
-            cout << "Enter total amount: ";
-            cin >> total;
+            clearInputBuffer();
+            name = getStringInput("Enter Name: ");
+            contact = getStringInput("Enter Contact: ");
+            email = getStringInput("Enter Email: ");
+            position = getStringInput("Enter Position: ");
+            city = getStringInput("Enter City: ");
+            e.setID(id);
+            e.setName(name);
+            e.setContact(contact);
+            e.setEmail(email);
+            e.setPosition(position);
+            e.setCity(city);
+            cout << "\n--- Employee Information ---\n";
+            e.display();
+            employees.Add(e);
+            break;
+        case 2:
+            cout << "\n--- Remove Employee ---\n";
+            cout << "Enter Employee ID to remove: ";
+            cin >> id;
+            employees.Remove(id);
+            break;
+        case 3:
+            cout << "\n--- Update Employee ---\n";
+            cout << "Enter Employee ID to update: ";
+            cin >> id;
+            employees.Update(id);
+            break;
+        case 4:
+            cout << "\n--- Search Employee ---\n";
+            cout << "Enter Employee ID to search: ";
+            cin >> id;
             {
-                bool found = false;
-                for (int i = 0; i < orders.size(); i++) {
-                    if (orders[i].getOrderID() == id) {
-                        orders[i].setTotalAmount(total);
-                        cout << "Total calculated: $" << total << endl;
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    cout << "Order not found!" << endl;
+                Employee* e = employees.GetEmployee(id);
+                if (e != NULL) {
+                    e->display();
+                } else {
+                    cout << "Employee not found!" << endl;
                 }
             }
+            break;
+        case 5:
+            employees.DisplayAll();
+            break;
+        case 6:
+            cout << "Returning to Main Menu...\n";
+            break;
+        default:
+            cout << "Invalid choice!\n";
+        }
+    } while (choice != 6);
+}
+
+void supplierMenu() {
+    int choice;
+    int id;
+    string name, contact, email, company, city;
+    Supplier s;
+
+    do {
+        cout << "\n========================================\n";
+        cout << "        SUPPLIER MANAGEMENT MENU\n";
+        cout << "========================================\n";
+        cout << "1. Add Supplier\n";
+        cout << "2. Remove Supplier\n";
+        cout << "3. Update Supplier\n";
+        cout << "4. Search Supplier\n";
+        cout << "5. Display All Suppliers\n";
+        cout << "6. Back to Main Menu\n";
+        cout << "Enter your choice: ";
+        if (!(cin >> choice)) {
+            clearInputBuffer();
+            cout << "Invalid input! Please enter a number.\n";
+            continue;
+        }
+
+        switch (choice) {
+        case 1:
+            cout << "\n--- Add Supplier ---\n";
+            cout << "Enter Supplier ID: ";
+            cin >> id;
+            clearInputBuffer();
+            name = getStringInput("Enter Name: ");
+            contact = getStringInput("Enter Contact: ");
+            email = getStringInput("Enter Email: ");
+            company = getStringInput("Enter Company: ");
+            city = getStringInput("Enter City: ");
+            s.setID(id);
+            s.setName(name);
+            s.setContact(contact);
+            s.setEmail(email);
+            s.setCompanyName(company);
+            {
+                Address* addr = new Address();
+                addr->setCity(city);
+                s.setAddress(addr);
+            }
+            cout << "\n--- Supplier Information ---\n";
+            s.display();
+            suppliers.Add(s);
+            break;
+        case 2:
+            cout << "\n--- Remove Supplier ---\n";
+            cout << "Enter Supplier ID to remove: ";
+            cin >> id;
+            suppliers.Remove(id);
+            break;
+        case 3:
+            cout << "\n--- Update Supplier ---\n";
+            cout << "Enter Supplier ID to update: ";
+            cin >> id;
+            suppliers.Update(id);
+            break;
+        case 4:
+            cout << "\n--- Search Supplier ---\n";
+            cout << "Enter Supplier ID to search: ";
+            cin >> id;
+            {
+                Supplier* s = suppliers.GetSupplier(id);
+                if (s != NULL) {
+                    s->display();
+                } else {
+                    cout << "Supplier not found!" << endl;
+                }
+            }
+            break;
+        case 5:
+            suppliers.DisplayAll();
             break;
         case 6:
             cout << "Returning to Main Menu...\n";
@@ -765,239 +1641,96 @@ void orderMenu() {
 }
 
 void categoryMenu() {
-    int ch, id;
-    string name;
+    int choice;
+    int id;
+    string name, desc;
+    Category c;
+
     do {
-        cout << "\n===== CATEGORY MENU =====\n";
-        cout << "1.Add 2.Update 3.Delete 4.Display 5.Back\n";
+        cout << "\n========================================\n";
+        cout << "        CATEGORY MANAGEMENT MENU\n";
+        cout << "========================================\n";
+        cout << "1. Add Category\n";
+        cout << "2. Remove Category\n";
+        cout << "3. Update Category\n";
+        cout << "4. Search Category\n";
+        cout << "5. Display All Categories\n";
+        cout << "6. Back to Main Menu\n";
         cout << "Enter your choice: ";
-        if (!(cin >> ch)) {
+        if (!(cin >> choice)) {
             clearInputBuffer();
-            cout << "Invalid input!\n";
+            cout << "Invalid input! Please enter a number.\n";
             continue;
         }
-        switch (ch) {
+
+        switch (choice) {
         case 1:
+            cout << "\n--- Add Category ---\n";
             cout << "Enter Category ID: ";
             cin >> id;
-            cout << "Enter Category Name: ";
-            cin >> name;
-            categories.push_back(Category(id, name));
-            cout << "Category Added\n";
+            clearInputBuffer();
+            name = getStringInput("Enter Name: ");
+            desc = getStringInput("Enter Description: ");
+            c.setCategoryID(id);
+            c.setCategoryName(name);
+            c.setDescription(desc);
+            cout << "\n--- Category Information ---\n";
+            c.displayDetails();
+            categories.Add(c);
             break;
         case 2:
+            cout << "\n--- Remove Category ---\n";
+            cout << "Enter Category ID to remove: ";
+            cin >> id;
+            categories.Remove(id);
+            break;
+        case 3:
+            cout << "\n--- Update Category ---\n";
             cout << "Enter Category ID to update: ";
             cin >> id;
-            {
-                bool found = false;
-                for (int i = 0; i < categories.size(); i++) {
-                    if (categories[i].getID() == id) {
-                        cout << "Enter new Category Name: ";
-                        cin >> name;
-                        categories[i].set(id, name);
-                        cout << "Category Updated\n";
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) cout << "Category not found!\n";
-            }
-            break;
-        case 3:
-            cout << "Enter Category ID to delete: ";
-            cin >> id;
-            {
-                bool found = false;
-                for (int i = 0; i < categories.size(); i++) {
-                    if (categories[i].getID() == id) {
-                        categories.erase(categories.begin() + i);
-                        cout << "Category Deleted\n";
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) cout << "Category not found!\n";
-            }
+            categories.Update(id);
             break;
         case 4:
-            for (int i = 0; i < categories.size(); i++) categories[i].display();
+            cout << "\n--- Search Category ---\n";
+            cout << "Enter Category ID to search: ";
+            cin >> id;
+            {
+                Category* c = categories.GetCategory(id);
+                if (c != NULL) {
+                    c->displayDetails();
+                } else {
+                    cout << "Category not found!" << endl;
+                }
+            }
             break;
         case 5:
+            categories.DisplayAll();
+            break;
+        case 6:
             cout << "Returning to Main Menu...\n";
             break;
         default:
             cout << "Invalid choice!\n";
         }
-    } while (ch != 5);
-}
-
-void supplierMenu() {
-    int ch, id;
-    string name, contact, email;
-    do {
-        cout << "\n===== SUPPLIER MENU =====\n";
-        cout << "1.Add 2.Update 3.Delete 4.Display 5.Back\n";
-        cout << "Enter your choice: ";
-        if (!(cin >> ch)) {
-            clearInputBuffer();
-            cout << "Invalid input!\n";
-            continue;
-        }
-        switch (ch) {
-        case 1:
-            cout << "Enter Supplier ID: ";
-            cin >> id;
-            cout << "Enter Name: ";
-            cin >> name;
-            cout << "Enter Contact: ";
-            cin >> contact;
-            cout << "Enter Email: ";
-            cin >> email;
-            suppliers.push_back(Supplier(id, name, contact, email));
-            cout << "Supplier Added\n";
-            break;
-        case 2:
-            cout << "Enter Supplier ID to update: ";
-            cin >> id;
-            {
-                bool found = false;
-                for (int i = 0; i < suppliers.size(); i++) {
-                    if (suppliers[i].getID() == id) {
-                        cout << "Enter new Name: ";
-                        cin >> name;
-                        cout << "Enter new Contact: ";
-                        cin >> contact;
-                        cout << "Enter new Email: ";
-                        cin >> email;
-                        suppliers[i].set(id, name, contact, email);
-                        cout << "Supplier Updated\n";
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) cout << "Supplier not found!\n";
-            }
-            break;
-        case 3:
-            cout << "Enter Supplier ID to delete: ";
-            cin >> id;
-            {
-                bool found = false;
-                for (int i = 0; i < suppliers.size(); i++) {
-                    if (suppliers[i].getID() == id) {
-                        suppliers.erase(suppliers.begin() + i);
-                        cout << "Supplier Deleted\n";
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) cout << "Supplier not found!\n";
-            }
-            break;
-        case 4:
-            for (int i = 0; i < suppliers.size(); i++) suppliers[i].display();
-            break;
-        case 5:
-            cout << "Returning to Main Menu...\n";
-            break;
-        default:
-            cout << "Invalid choice!\n";
-        }
-    } while (ch != 5);
-}
-
-void employeeMenu() {
-    int ch, id;
-    string name, pos;
-    float salary;
-    do {
-        cout << "\n===== EMPLOYEE MENU =====\n";
-        cout << "1.Add 2.Update 3.Delete 4.Display 5.Back\n";
-        cout << "Enter your choice: ";
-        if (!(cin >> ch)) {
-            clearInputBuffer();
-            cout << "Invalid input!\n";
-            continue;
-        }
-        switch (ch) {
-        case 1:
-            cout << "Enter Employee ID: ";
-            cin >> id;
-            cout << "Enter Name: ";
-            cin >> name;
-            cout << "Enter Position: ";
-            cin >> pos;
-            cout << "Enter Salary: ";
-            cin >> salary;
-            employees.push_back(Employee(id, name, pos, salary));
-            cout << "Employee Added\n";
-            break;
-        case 2:
-            cout << "Enter Employee ID to update: ";
-            cin >> id;
-            {
-                bool found = false;
-                for (int i = 0; i < employees.size(); i++) {
-                    if (employees[i].getID() == id) {
-                        cout << "Enter new Name: ";
-                        cin >> name;
-                        cout << "Enter new Position: ";
-                        cin >> pos;
-                        cout << "Enter new Salary: ";
-                        cin >> salary;
-                        employees[i].set(id, name, pos, salary);
-                        cout << "Employee Updated\n";
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) cout << "Employee not found!\n";
-            }
-            break;
-        case 3:
-            cout << "Enter Employee ID to delete: ";
-            cin >> id;
-            {
-                bool found = false;
-                for (int i = 0; i < employees.size(); i++) {
-                    if (employees[i].getID() == id) {
-                        employees.erase(employees.begin() + i);
-                        cout << "Employee Deleted\n";
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) cout << "Employee not found!\n";
-            }
-            break;
-        case 4:
-            for (int i = 0; i < employees.size(); i++) employees[i].display();
-            break;
-        case 5:
-            cout << "Returning to Main Menu...\n";
-            break;
-        default:
-            cout << "Invalid choice!\n";
-        }
-    } while (ch != 5);
+    } while (choice != 6);
 }
 
 void warehouseMenu() {
     int choice;
-    int id, cap, space;
-    string loc;
+    int id, capacity;
+    string name, location;
+    Warehouse w;
 
     do {
         cout << "\n========================================\n";
-        cout << "       WAREHOUSE MANAGEMENT MENU\n";
+        cout << "        WAREHOUSE MANAGEMENT MENU\n";
         cout << "========================================\n";
         cout << "1. Add Warehouse\n";
-        cout << "2. Update Warehouse\n";
-        cout << "3. Display All Warehouses\n";
-        cout << "4. Check Capacity\n";
-        cout << "5. Allocate Space\n";
-        cout << "6. Remove Product\n";
-        cout << "7. Back to Main Menu\n";
+        cout << "2. Remove Warehouse\n";
+        cout << "3. Update Warehouse\n";
+        cout << "4. Search Warehouse\n";
+        cout << "5. Display All Warehouses\n";
+        cout << "6. Back to Main Menu\n";
         cout << "Enter your choice: ";
         if (!(cin >> choice)) {
             clearInputBuffer();
@@ -1010,133 +1743,73 @@ void warehouseMenu() {
             cout << "\n--- Add Warehouse ---\n";
             cout << "Enter Warehouse ID: ";
             cin >> id;
-            cout << "Enter Location: ";
-            cin >> loc;
-            cout << "Enter Total Capacity: ";
-            cin >> cap;
-            cout << "Enter Available Space: ";
-            cin >> space;
-            warehouses.push_back(Warehouse(id, loc, cap, space));
-            cout << "Warehouse added successfully!" << endl;
+            clearInputBuffer();
+            name = getStringInput("Enter Name: ");
+            location = getStringInput("Enter Location: ");
+            cout << "Enter Capacity: ";
+            cin >> capacity;
+            clearInputBuffer();
+            w.setID(id);
+            w.setName(name);
+            w.setLocation(location);
+            w.setCapacity(capacity);
+            cout << "\n--- Warehouse Information ---\n";
+            w.display();
+            warehouses.Add(w);
             break;
         case 2:
+            cout << "\n--- Remove Warehouse ---\n";
+            cout << "Enter Warehouse ID to remove: ";
+            cin >> id;
+            warehouses.Remove(id);
+            break;
+        case 3:
             cout << "\n--- Update Warehouse ---\n";
             cout << "Enter Warehouse ID to update: ";
             cin >> id;
-            {
-                bool found = false;
-                for (int i = 0; i < warehouses.size(); i++) {
-                    if (warehouses[i].getWarehouseID() == id) {
-                        cout << "Enter new Location: ";
-                        cin >> loc;
-                        cout << "Enter new Total Capacity: ";
-                        cin >> cap;
-                        cout << "Enter new Available Space: ";
-                        cin >> space;
-                        warehouses[i].setLocation(loc);
-                        warehouses[i].setTotalCapacity(cap);
-                        warehouses[i].setAvailableSpace(space);
-                        cout << "Warehouse updated successfully!" << endl;
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    cout << "Warehouse not found!" << endl;
-                }
-            }
-            break;
-        case 3:
-            cout << "\n--- All Warehouses ---\n";
-            if (warehouses.empty()) {
-                cout << "No warehouses found." << endl;
-            } else {
-                for (int i = 0; i < warehouses.size(); i++) {
-                    warehouses[i].display();
-                    cout << "-----------------------------------\n";
-                }
-            }
+            warehouses.Update(id);
             break;
         case 4:
-            cout << "Enter Warehouse ID: ";
+            cout << "\n--- Search Warehouse ---\n";
+            cout << "Enter Warehouse ID to search: ";
             cin >> id;
             {
-                bool found = false;
-                for (int i = 0; i < warehouses.size(); i++) {
-                    if (warehouses[i].getWarehouseID() == id) {
-                        cout << "Available Space: " << warehouses[i].getAvailableSpace() << endl;
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
+                Warehouse* w = warehouses.GetWarehouse(id);
+                if (w != NULL) {
+                    w->display();
+                } else {
                     cout << "Warehouse not found!" << endl;
                 }
             }
             break;
         case 5:
-            cout << "Enter Warehouse ID: ";
-            cin >> id;
-            cout << "Enter space to allocate: ";
-            cin >> space;
-            {
-                bool found = false;
-                for (int i = 0; i < warehouses.size(); i++) {
-                    if (warehouses[i].getWarehouseID() == id) {
-                        warehouses[i].allocateSpace(space);
-                        cout << "Space allocated. Remaining: " << warehouses[i].getAvailableSpace() << endl;
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    cout << "Warehouse not found!" << endl;
-                }
-            }
+            warehouses.DisplayAll();
             break;
         case 6:
-            cout << "Enter Warehouse ID: ";
-            cin >> id;
-            cout << "Enter space to release: ";
-            cin >> space;
-            {
-                bool found = false;
-                for (int i = 0; i < warehouses.size(); i++) {
-                    if (warehouses[i].getWarehouseID() == id) {
-                        warehouses[i].removeProduct(space);
-                        cout << "Space released. Available: " << warehouses[i].getAvailableSpace() << endl;
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    cout << "Warehouse not found!" << endl;
-                }
-            }
-            break;
-        case 7:
             cout << "Returning to Main Menu...\n";
             break;
         default:
             cout << "Invalid choice!\n";
         }
-    } while (choice != 7);
+    } while (choice != 6);
 }
 
 void inventoryMenu() {
     int choice;
-    int id, items;
-    string list, date;
+    int itemID, qty, wid, cap;
+    string itemName, desc, wname, location;
+    double price;
+    Inventory inv;
 
     do {
         cout << "\n========================================\n";
         cout << "        INVENTORY MANAGEMENT MENU\n";
         cout << "========================================\n";
-        cout << "1. Add Inventory\n";
-        cout << "2. Update Inventory\n";
-        cout << "3. Display All Inventories\n";
-        cout << "4. Update Quantity\n";
-        cout << "5. Check Stock\n";
+        cout << "1. Add Inventory Item\n";
+        cout << "2. Remove Inventory Item\n";
+        cout << "3. Update Inventory Item\n";
+        cout << "4. Search Inventory Item\n";
+        cout << "5. Display All Inventory Items\n";
         cout << "6. Back to Main Menu\n";
         cout << "Enter your choice: ";
         if (!(cin >> choice)) {
@@ -1147,92 +1820,66 @@ void inventoryMenu() {
 
         switch (choice) {
         case 1:
-            cout << "\n--- Add Inventory ---\n";
-            cout << "Enter Inventory ID: ";
-            cin >> id;
-            cout << "Enter Product List: ";
-            cin >> list;
-            cout << "Enter Total Items: ";
-            cin >> items;
-            cout << "Enter Last Updated Date: ";
-            cin >> date;
-            inventories.push_back(Inventory(id, list, items, date));
-            cout << "Item added successfully!" << endl;
+            cout << "\n--- Add Inventory Item ---\n";
+            cout << "Enter Warehouse ID: ";
+            cin >> wid;
+            clearInputBuffer();
+            wname = getStringInput("Enter Warehouse Name: ");
+            location = getStringInput("Enter Location: ");
+            cout << "Enter Capacity: ";
+            cin >> cap;
+            clearInputBuffer();
+            cout << "Enter Item ID: ";
+            cin >> itemID;
+            clearInputBuffer();
+            itemName = getStringInput("Enter Item Name: ");
+            cout << "Enter Price: ";
+            cin >> price;
+            clearInputBuffer();
+            cout << "Enter Quantity: ";
+            cin >> qty;
+            clearInputBuffer();
+            desc = getStringInput("Enter Description: ");
+            inv.setID(wid);
+            inv.setName(wname);
+            inv.setLocation(location);
+            inv.setCapacity(cap);
+            inv.setItemID(itemID);
+            inv.setItemName(itemName);
+            inv.setPrice(price);
+            inv.setQuantity(qty);
+            inv.setDescription(desc);
+            cout << "\n--- Inventory Information ---\n";
+            inv.display();
+            inventoryItems.Add(inv);
             break;
         case 2:
-            cout << "\n--- Update Inventory ---\n";
-            cout << "Enter Inventory ID to update: ";
-            cin >> id;
-            {
-                bool found = false;
-                for (int i = 0; i < inventories.size(); i++) {
-                    if (inventories[i].getInventoryID() == id) {
-                        cout << "Enter new Product List: ";
-                        cin >> list;
-                        cout << "Enter new Total Items: ";
-                        cin >> items;
-                        cout << "Enter new Last Updated Date: ";
-                        cin >> date;
-                        inventories[i].setProductList(list);
-                        inventories[i].setTotalItems(items);
-                        inventories[i].setDate(date);
-                        cout << "Inventory updated successfully!" << endl;
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    cout << "Inventory not found!" << endl;
-                }
-            }
+            cout << "\n--- Remove Inventory Item ---\n";
+            cout << "Enter Item ID to remove: ";
+            cin >> itemID;
+            inventoryItems.Remove(itemID);
             break;
         case 3:
-            cout << "\n--- All Inventories ---\n";
-            if (inventories.empty()) {
-                cout << "No inventories found." << endl;
-            } else {
-                for (int i = 0; i < inventories.size(); i++) {
-                    inventories[i].display();
-                    cout << "-----------------------------------\n";
-                }
-            }
+            cout << "\n--- Update Inventory Item ---\n";
+            cout << "Enter Item ID to update: ";
+            cin >> itemID;
+            inventoryItems.Update(itemID);
             break;
         case 4:
-            cout << "Enter Inventory ID: ";
-            cin >> id;
-            cout << "Enter quantity change (positive to add, negative to reduce): ";
-            cin >> items;
+            cout << "\n--- Search Inventory Item ---\n";
+            cout << "Enter Item ID to search: ";
+            cin >> itemID;
             {
-                bool found = false;
-                for (int i = 0; i < inventories.size(); i++) {
-                    if (inventories[i].getInventoryID() == id) {
-                        inventories[i].updateQuantity(items);
-                        cout << "Quantity updated: " << inventories[i].getTotalItems() << endl;
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    cout << "Inventory not found!" << endl;
+                Inventory* inv = inventoryItems.GetInventory(itemID);
+                if (inv != NULL) {
+                    inv->display();
+                } else {
+                    cout << "Inventory item not found!" << endl;
                 }
             }
             break;
         case 5:
-            cout << "Enter Inventory ID: ";
-            cin >> id;
-            {
-                bool found = false;
-                for (int i = 0; i < inventories.size(); i++) {
-                    if (inventories[i].getInventoryID() == id) {
-                        cout << "Stock Level: " << inventories[i].getTotalItems() << endl;
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    cout << "Inventory not found!" << endl;
-                }
-            }
+            inventoryItems.DisplayAll();
             break;
         case 6:
             cout << "Returning to Main Menu...\n";
@@ -1245,18 +1892,20 @@ void inventoryMenu() {
 
 void shipmentMenu() {
     int choice;
-    int sid, oid;
-    string sDate, dDate, status;
+    int shipID, itemID, qty, wid, cap;
+    string itemName, status, wname, location;
+    double price;
+    Shipment ship;
 
     do {
         cout << "\n========================================\n";
         cout << "        SHIPMENT MANAGEMENT MENU\n";
         cout << "========================================\n";
-        cout << "1. Create Shipment\n";
-        cout << "2. Update Status\n";
-        cout << "3. Display All Shipments\n";
-        cout << "4. Track Shipment\n";
-        cout << "5. Confirm Delivery\n";
+        cout << "1. Add Shipment\n";
+        cout << "2. Remove Shipment\n";
+        cout << "3. Update Shipment\n";
+        cout << "4. Search Shipment\n";
+        cout << "5. Display All Shipments\n";
         cout << "6. Back to Main Menu\n";
         cout << "Enter your choice: ";
         if (!(cin >> choice)) {
@@ -1267,85 +1916,70 @@ void shipmentMenu() {
 
         switch (choice) {
         case 1:
-            cout << "\n--- Create Shipment ---\n";
+            cout << "\n--- Add Shipment ---\n";
             cout << "Enter Shipment ID: ";
-            cin >> sid;
-            cout << "Enter Order ID: ";
-            cin >> oid;
-            cout << "Enter Shipment Date: ";
-            cin >> sDate;
-            cout << "Enter Delivery Date: ";
-            cin >> dDate;
-            cout << "Enter Status: ";
-            cin >> status;
-            shipments.push_back(Shipment(sid, oid, sDate, dDate, status));
-            cout << "Shipment created successfully!" << endl;
+            cin >> shipID;
+            clearInputBuffer();
+            cout << "Enter Warehouse ID: ";
+            cin >> wid;
+            clearInputBuffer();
+            wname = getStringInput("Enter Warehouse Name: ");
+            location = getStringInput("Enter Location: ");
+            cout << "Enter Capacity: ";
+            cin >> cap;
+            clearInputBuffer();
+            cout << "Enter Item ID: ";
+            cin >> itemID;
+            clearInputBuffer();
+            itemName = getStringInput("Enter Item Name: ");
+            cout << "Enter Price: ";
+            cin >> price;
+            clearInputBuffer();
+            cout << "Enter Quantity: ";
+            cin >> qty;
+            clearInputBuffer();
+            status = getStringInput("Enter Status: ");
+            ship.setShipmentID(shipID);
+            ship.setID(wid);
+            ship.setName(wname);
+            ship.setLocation(location);
+            ship.setCapacity(cap);
+            ship.setItemID(itemID);
+            ship.setItemName(itemName);
+            ship.setPrice(price);
+            ship.setQuantity(qty);
+            ship.setStatus(status);
+            cout << "\n--- Shipment Information ---\n";
+            ship.display();
+            shipments.Add(ship);
             break;
         case 2:
-            cout << "Enter Shipment ID: ";
-            cin >> sid;
-            cout << "Enter new status: ";
-            cin >> status;
-            {
-                bool found = false;
-                for (int i = 0; i < shipments.size(); i++) {
-                    if (shipments[i].getShipmentID() == sid) {
-                        shipments[i].setStatus(status);
-                        cout << "Status updated to: " << status << endl;
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    cout << "Shipment not found!" << endl;
-                }
-            }
+            cout << "\n--- Remove Shipment ---\n";
+            cout << "Enter Shipment ID to remove: ";
+            cin >> shipID;
+            shipments.Remove(shipID);
             break;
         case 3:
-            cout << "\n--- All Shipments ---\n";
-            if (shipments.empty()) {
-                cout << "No shipments found." << endl;
-            } else {
-                for (int i = 0; i < shipments.size(); i++) {
-                    shipments[i].display();
-                    cout << "-----------------------------------\n";
-                }
-            }
+            cout << "\n--- Update Shipment ---\n";
+            cout << "Enter Shipment ID to update: ";
+            cin >> shipID;
+            shipments.Update(shipID);
             break;
         case 4:
-            cout << "Enter Shipment ID: ";
-            cin >> sid;
+            cout << "\n--- Search Shipment ---\n";
+            cout << "Enter Shipment ID to search: ";
+            cin >> shipID;
             {
-                bool found = false;
-                for (int i = 0; i < shipments.size(); i++) {
-                    if (shipments[i].getShipmentID() == sid) {
-                        cout << "Shipment Status: " << shipments[i].getStatus() << endl;
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
+                Shipment* ship = shipments.GetShipment(shipID);
+                if (ship != NULL) {
+                    ship->display();
+                } else {
                     cout << "Shipment not found!" << endl;
                 }
             }
             break;
         case 5:
-            cout << "Enter Shipment ID: ";
-            cin >> sid;
-            {
-                bool found = false;
-                for (int i = 0; i < shipments.size(); i++) {
-                    if (shipments[i].getShipmentID() == sid) {
-                        shipments[i].confirmDelivery();
-                        cout << "Delivery confirmed!" << endl;
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    cout << "Shipment not found!" << endl;
-                }
-            }
+            shipments.DisplayAll();
             break;
         case 6:
             cout << "Returning to Main Menu...\n";
@@ -1355,7 +1989,6 @@ void shipmentMenu() {
         }
     } while (choice != 6);
 }
-
 
 int main() {
     int choice;
@@ -1367,13 +2000,13 @@ int main() {
         cout << "1. Manage Customer\n";
         cout << "2. Manage Product\n";
         cout << "3. Manage Order\n";
-        cout << "4. Manage Category\n";
+        cout << "4. Manage Employee\n";
         cout << "5. Manage Supplier\n";
-        cout << "6. Manage Employee\n";
+        cout << "6. Manage Category\n";
         cout << "7. Manage Warehouse\n";
         cout << "8. Manage Inventory\n";
         cout << "9. Manage Shipment\n";
-        cout << "10. Exit\n";
+        cout << "0. Exit\n";
         cout << "Enter your choice: ";
         if (!(cin >> choice)) {
             clearInputBuffer();
@@ -1392,13 +2025,13 @@ int main() {
             orderMenu();
             break;
         case 4:
-            categoryMenu();
+            employeeMenu();
             break;
         case 5:
             supplierMenu();
             break;
         case 6:
-            employeeMenu();
+            categoryMenu();
             break;
         case 7:
             warehouseMenu();
@@ -1409,13 +2042,13 @@ int main() {
         case 9:
             shipmentMenu();
             break;
-        case 10:
+        case 0:
             cout << "Exiting program...\n";
             break;
         default:
             cout << "Invalid choice!\n";
         }
-    } while (choice != 10);
+    } while (choice != 0);
 
     return 0;
 }
