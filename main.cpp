@@ -1,10 +1,55 @@
 #include <iostream>
 #include <string>
+#include <fstream>
+#include <sstream>
+#include <limits>
 using namespace std;
 
 void clearInputBuffer() {
     cin.clear();
-    cin.ignore(1000, '\n');
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+}
+
+int getValidatedInt(const string& prompt) {
+    int value;
+    while (true) {
+        cout << prompt;
+        if (cin >> value) {
+            clearInputBuffer();
+            return value;
+        } else {
+            cout << "Invalid input. Please enter an integer.\n";
+            clearInputBuffer();
+        }
+    }
+}
+
+float getValidatedFloat(const string& prompt) {
+    float value;
+    while (true) {
+        cout << prompt;
+        if (cin >> value) {
+            clearInputBuffer();
+            return value;
+        } else {
+            cout << "Invalid input. Please enter a number.\n";
+            clearInputBuffer();
+        }
+    }
+}
+
+int getValidatedMenuChoice(int low, int high) {
+    int choice;
+    while (true) {
+        cout << "Enter your choice: ";
+        if (cin >> choice && choice >= low && choice <= high) {
+            clearInputBuffer();
+            return choice;
+        } else {
+            cout << "Invalid choice. Please enter a number between " << low << " and " << high << ".\n";
+            clearInputBuffer();
+        }
+    }
 }
 
 string getStringInput(string prompt) {
@@ -149,6 +194,7 @@ public:
         if (productCount < 50) {
             products[productCount] = p;
             productCount++;
+            totalAmount += p.getPrice();
         }
     }
 
@@ -381,13 +427,21 @@ class CustomerCollection {
 private:
     Customer customers[100];
     int count;
+    int nextID;
 
 public:
     CustomerCollection() {
         count = 0;
+        nextID = 1;
     }
 
+    int getNextID() { return nextID++; }
+
     void Add(Customer c) {
+        if (FindByID(c.getID()) != -1) {
+            cout << "Error: Customer with ID " << c.getID() << " already exists!" << endl;
+            return;
+        }
         if (count < 100) {
             customers[count] = c;
             count++;
@@ -414,16 +468,12 @@ public:
         int index = FindByID(id);
         if (index != -1) {
             Customer c;
-            int cid;
             string name, contact, email, addr;
-            cout << "Enter new Customer ID: ";
-            cin >> cid;
-            clearInputBuffer();
             name = getStringInput("Enter new Name: ");
             contact = getStringInput("Enter new Contact: ");
             email = getStringInput("Enter new Email: ");
             addr = getStringInput("Enter new Address: ");
-            c.setID(cid);
+            c.setID(customers[index].getID());
             c.setName(name);
             c.setContact(contact);
             c.setEmail(email);
@@ -465,19 +515,87 @@ public:
     }
 
     int getCount() { return count; }
+
+    void loadFromCSV(const string& filename) {
+        ifstream file(filename);
+        if (!file.is_open()) {
+            cerr << "Warning: Could not open " << filename << ". Starting with empty collection.\n";
+            return;
+        }
+        string line;
+        bool headerSkipped = false;
+        while (getline(file, line)) {
+            if (line.empty()) continue;
+            if (!headerSkipped) {
+                if (line.find("ID") != string::npos || line.find("id") != string::npos) {
+                    headerSkipped = true;
+                    continue;
+                }
+                headerSkipped = true;
+            }
+            stringstream ss(line);
+            string idStr, name, contact, email, address;
+            if (getline(ss, idStr, ',') &&
+                getline(ss, name, ',') &&
+                getline(ss, contact, ',') &&
+                getline(ss, email, ',') &&
+                getline(ss, address, ',')) {
+                Customer c;
+                int loadedID = stoi(idStr);
+                c.setID(loadedID);
+                c.setName(name);
+                c.setContact(contact);
+                c.setEmail(email);
+                c.setAddress(address);
+                customers[count] = c;
+                count++;
+                if (loadedID >= nextID) {
+                    nextID = loadedID + 1;
+                }
+            }
+        }
+        file.close();
+        cout << "Loaded " << count << " customers from " << filename << ".\n";
+    }
+
+    void saveToCSV(const string& filename) {
+        ofstream file(filename);
+        if (!file.is_open()) {
+            cerr << "Error: Could not write to " << filename << endl;
+            return;
+        }
+        file << "ID,Name,Contact,Email,Address\n";
+        for (int i = 0; i < count; i++) {
+            file << customers[i].getID() << ","
+                 << customers[i].getName() << ","
+                 << customers[i].getContact() << ","
+                 << customers[i].getEmail() << ","
+                 << customers[i].getAddress() << "\n";
+        }
+        file.close();
+        cout << "Saved " << count << " customers to " << filename << ".\n";
+    }
 };
 
 class ProductCollection {
 private:
     Product products[100];
     int count;
+    int nextID;
 
 public:
     ProductCollection() {
         count = 0;
+        nextID = 1;
     }
 
+    int getNextID() { return nextID++; }
+
     void Add(Product p) {
+        if (FindByID(p.getProductID()) != -1) {
+            cout << "Error: Product with ID " << p.getProductID() << " already exists!" << endl;
+            return;
+        }
         if (count < 100) {
             products[count] = p;
             count++;
@@ -504,22 +622,15 @@ public:
         int index = FindByID(id);
         if (index != -1) {
             Product p;
-            int pid, catId, qty;
+            int catId, qty;
             string name, desc;
             float price;
-            cout << "Enter new Product ID: ";
-            cin >> pid;
-            clearInputBuffer();
             name = getStringInput("Enter new Name: ");
-            cout << "Enter new Category ID: ";
-            cin >> catId;
-            cout << "Enter new Price: ";
-            cin >> price;
-            cout << "Enter new Quantity: ";
-            cin >> qty;
-            clearInputBuffer();
+            catId = getValidatedInt("Enter new Category ID: ");
+            price = getValidatedFloat("Enter new Price: ");
+            qty = getValidatedInt("Enter new Quantity: ");
             desc = getStringInput("Enter new Description: ");
-            p.setProductID(pid);
+            p.setProductID(products[index].getProductID());
             p.setProductName(name);
             p.setCategoryID(catId);
             p.setPrice(price);
@@ -562,19 +673,90 @@ public:
     }
 
     int getCount() { return count; }
+
+    void loadFromCSV(const string& filename) {
+        ifstream file(filename);
+        if (!file.is_open()) {
+            cerr << "Warning: Could not open " << filename << ". Starting with empty collection.\n";
+            return;
+        }
+        string line;
+        bool headerSkipped = false;
+        while (getline(file, line)) {
+            if (line.empty()) continue;
+            if (!headerSkipped) {
+                if (line.find("ProductID") != string::npos || line.find("ID") != string::npos) {
+                    headerSkipped = true;
+                    continue;
+                }
+                headerSkipped = true;
+            }
+            stringstream ss(line);
+            string pidStr, name, catIdStr, priceStr, qtyStr, desc;
+            if (getline(ss, pidStr, ',') &&
+                getline(ss, name, ',') &&
+                getline(ss, catIdStr, ',') &&
+                getline(ss, priceStr, ',') &&
+                getline(ss, qtyStr, ',') &&
+                getline(ss, desc, ',')) {
+                Product p;
+                int loadedPID = stoi(pidStr);
+                p.setProductID(loadedPID);
+                p.setProductName(name);
+                p.setCategoryID(stoi(catIdStr));
+                p.setPrice(stof(priceStr));
+                p.setQuantity(stoi(qtyStr));
+                p.setDescription(desc);
+                products[count] = p;
+                count++;
+                if (loadedPID >= nextID) {
+                    nextID = loadedPID + 1;
+                }
+            }
+        }
+        file.close();
+        cout << "Loaded " << count << " products from " << filename << ".\n";
+    }
+
+    void saveToCSV(const string& filename) {
+        ofstream file(filename);
+        if (!file.is_open()) {
+            cerr << "Error: Could not write to " << filename << endl;
+            return;
+        }
+        file << "ProductID,ProductName,CategoryID,Price,Quantity,Description\n";
+        for (int i = 0; i < count; i++) {
+            file << products[i].getProductID() << ","
+                 << products[i].getProductName() << ","
+                 << products[i].getCategoryID() << ","
+                 << products[i].getPrice() << ","
+                 << products[i].getQuantity() << ","
+                 << products[i].getDescription() << "\n";
+        }
+        file.close();
+        cout << "Saved " << count << " products to " << filename << ".\n";
+    }
 };
 
 class OrderCollection {
 private:
     Order orders[100];
     int count;
+    int nextID;
 
 public:
     OrderCollection() {
         count = 0;
+        nextID = 1;
     }
 
+    int getNextID() { return nextID++; }
+
     void Add(Order o) {
+        if (FindByID(o.getOrderID()) != -1) {
+            cout << "Error: Order with ID " << o.getOrderID() << " already exists!" << endl;
+            return;
+        }
         if (count < 100) {
             orders[count] = o;
             count++;
@@ -600,9 +782,7 @@ public:
     void Update(int id) {
         int index = FindByID(id);
         if (index != -1) {
-            string status;
-            cout << "Enter new status: ";
-            cin >> status;
+            string status = getStringInput("Enter new status: ");
             orders[index].setOrderStatus(status);
             cout << "Order updated successfully!" << endl;
         } else {
@@ -640,6 +820,66 @@ public:
     }
 
     int getCount() { return count; }
+
+    void loadFromCSV(const string& filename) {
+        ifstream file(filename);
+        if (!file.is_open()) {
+            cerr << "Warning: Could not open " << filename << ". Starting with empty collection.\n";
+            return;
+        }
+        string line;
+        bool headerSkipped = false;
+        while (getline(file, line)) {
+            if (line.empty()) continue;
+            if (!headerSkipped) {
+                if (line.find("OrderID") != string::npos || line.find("ID") != string::npos) {
+                    headerSkipped = true;
+                    continue;
+                }
+                headerSkipped = true;
+            }
+            stringstream ss(line);
+            string oidStr, date, custIdStr, totalStr, status;
+            if (getline(ss, oidStr, ',') &&
+                getline(ss, date, ',') &&
+                getline(ss, custIdStr, ',') &&
+                getline(ss, totalStr, ',') &&
+                getline(ss, status, ',')) {
+                Order o;
+                int loadedOID = stoi(oidStr);
+                o.setOrderID(loadedOID);
+                o.setOrderDate(date);
+                o.setCustomerID(stoi(custIdStr));
+                o.setTotalAmount(stof(totalStr));
+                o.setOrderStatus(status);
+                orders[count] = o;
+                count++;
+                if (loadedOID >= nextID) {
+                    nextID = loadedOID + 1;
+                }
+            }
+        }
+        file.close();
+        cout << "Loaded " << count << " orders from " << filename << ".\n";
+    }
+
+    void saveToCSV(const string& filename) {
+        ofstream file(filename);
+        if (!file.is_open()) {
+            cerr << "Error: Could not write to " << filename << endl;
+            return;
+        }
+        file << "OrderID,OrderDate,CustomerID,TotalAmount,OrderStatus\n";
+        for (int i = 0; i < count; i++) {
+            file << orders[i].getOrderID() << ","
+                 << orders[i].getOrderDate() << ","
+                 << orders[i].getCustomerID() << ","
+                 << orders[i].getTotalAmount() << ","
+                 << orders[i].getOrderStatus() << "\n";
+        }
+        file.close();
+        cout << "Saved " << count << " orders to " << filename << ".\n";
+    }
 };
 
 class EmployeeCollection {
@@ -1236,48 +1476,46 @@ void customerMenu() {
         cout << "4. Search Customer\n";
         cout << "5. Display All Customers\n";
         cout << "6. Back to Main Menu\n";
-        cout << "Enter your choice: ";
-        if (!(cin >> choice)) {
-            clearInputBuffer();
-            cout << "Invalid input! Please enter a number.\n";
-            continue;
-        }
+        choice = getValidatedMenuChoice(1, 6);
 
         switch (choice) {
         case 1:
             cout << "\n--- Add Customer ---\n";
-            cout << "Enter Customer ID: ";
-            cin >> id;
-            clearInputBuffer();
+            c.setID(customers.getNextID());
             name = getStringInput("Enter Name: ");
             contact = getStringInput("Enter Contact: ");
             email = getStringInput("Enter Email: ");
             addr = getStringInput("Enter Address: ");
-            c.setID(id);
             c.setName(name);
             c.setContact(contact);
             c.setEmail(email);
             c.setAddress(addr);
+            cout << "Assigned Customer ID: " << c.getID() << endl;
             cout << "\n--- Customer Information ---\n";
             c.display();
             customers.Add(c);
             break;
         case 2:
             cout << "\n--- Remove Customer ---\n";
-            cout << "Enter Customer ID to remove: ";
-            cin >> id;
-            customers.Remove(id);
+            id = getValidatedInt("Enter Customer ID to remove: ");
+            if (customers.FindByID(id) == -1) {
+                cout << "Customer not found!\n";
+            } else {
+                customers.Remove(id);
+            }
             break;
         case 3:
             cout << "\n--- Update Customer ---\n";
-            cout << "Enter Customer ID to update: ";
-            cin >> id;
-            customers.Update(id);
+            id = getValidatedInt("Enter Customer ID to update: ");
+            if (customers.FindByID(id) == -1) {
+                cout << "Customer not found!\n";
+            } else {
+                customers.Update(id);
+            }
             break;
         case 4:
             cout << "\n--- Search Customer ---\n";
-            cout << "Enter Customer ID to search: ";
-            cin >> id;
+            id = getValidatedInt("Enter Customer ID to search: ");
             {
                 Customer* c = customers.GetCustomer(id);
                 if (c != NULL) {
@@ -1293,8 +1531,6 @@ void customerMenu() {
         case 6:
             cout << "Returning to Main Menu...\n";
             break;
-        default:
-            cout << "Invalid choice!\n";
         }
     } while (choice != 6);
 }
@@ -1316,54 +1552,48 @@ void productMenu() {
         cout << "4. Search Product\n";
         cout << "5. Display All Products\n";
         cout << "6. Back to Main Menu\n";
-        cout << "Enter your choice: ";
-        if (!(cin >> choice)) {
-            clearInputBuffer();
-            cout << "Invalid input! Please enter a number.\n";
-            continue;
-        }
+        choice = getValidatedMenuChoice(1, 6);
 
         switch (choice) {
         case 1:
             cout << "\n--- Add Product ---\n";
-            cout << "Enter Product ID: ";
-            cin >> id;
-            clearInputBuffer();
             name = getStringInput("Enter Name: ");
-            cout << "Enter Category ID: ";
-            cin >> catId;
-            cout << "Enter Price: ";
-            cin >> price;
-            cout << "Enter Quantity: ";
-            cin >> qty;
-            clearInputBuffer();
+            catId = getValidatedInt("Enter Category ID: ");
+            price = getValidatedFloat("Enter Price: ");
+            qty = getValidatedInt("Enter Quantity: ");
             desc = getStringInput("Enter Description: ");
-            p.setProductID(id);
+            p.setProductID(products.getNextID());
             p.setProductName(name);
             p.setCategoryID(catId);
             p.setPrice(price);
             p.setQuantity(qty);
             p.setDescription(desc);
+            cout << "Assigned Product ID: " << p.getProductID() << endl;
             cout << "\n--- Product Information ---\n";
             p.displayDetails();
             products.Add(p);
             break;
         case 2:
             cout << "\n--- Remove Product ---\n";
-            cout << "Enter Product ID to remove: ";
-            cin >> id;
-            products.Remove(id);
+            id = getValidatedInt("Enter Product ID to remove: ");
+            if (products.FindByID(id) == -1) {
+                cout << "Product not found!\n";
+            } else {
+                products.Remove(id);
+            }
             break;
         case 3:
             cout << "\n--- Update Product ---\n";
-            cout << "Enter Product ID to update: ";
-            cin >> id;
-            products.Update(id);
+            id = getValidatedInt("Enter Product ID to update: ");
+            if (products.FindByID(id) == -1) {
+                cout << "Product not found!\n";
+            } else {
+                products.Update(id);
+            }
             break;
         case 4:
             cout << "\n--- Search Product ---\n";
-            cout << "Enter Product ID to search: ";
-            cin >> id;
+            id = getValidatedInt("Enter Product ID to search: ");
             {
                 Product* p = products.GetProduct(id);
                 if (p != NULL) {
@@ -1379,8 +1609,6 @@ void productMenu() {
         case 6:
             cout << "Returning to Main Menu...\n";
             break;
-        default:
-            cout << "Invalid choice!\n";
         }
     } while (choice != 6);
 }
@@ -1401,58 +1629,59 @@ void orderMenu() {
         cout << "4. Search Order\n";
         cout << "5. Display All Orders\n";
         cout << "6. Back to Main Menu\n";
-        cout << "Enter your choice: ";
-        if (!(cin >> choice)) {
-            clearInputBuffer();
-            cout << "Invalid input! Please enter a number.\n";
-            continue;
-        }
+        choice = getValidatedMenuChoice(1, 6);
 
         switch (choice) {
         case 1:
             cout << "\n--- Create Order ---\n";
-            cout << "Enter Order ID: ";
-            cin >> id;
-            cout << "Enter Order Date: ";
-            cin >> date;
-            cout << "Enter Customer ID: ";
-            cin >> custId;
-            cout << "How many products in this order? ";
-            cin >> count;
-            o.setOrderID(id);
-            o.setOrderDate(date);
-            o.setCustomerID(custId);
-            for (int i = 0; i < count; i++) {
-                int pid;
-                cout << "Enter Product ID " << i + 1 << ": ";
-                cin >> pid;
-                Product* p = products.GetProduct(pid);
-                if (p != NULL) {
-                    o.addProduct(*p);
-                } else {
-                    cout << "Product not found! Skipping..." << endl;
+            {
+                Order o;
+                date = getStringInput("Enter Order Date: ");
+                custId = getValidatedInt("Enter Customer ID: ");
+                if (customers.FindByID(custId) == -1) {
+                    cout << "Customer not found!\n";
+                    break;
                 }
+                count = getValidatedInt("How many products in this order? ");
+                o.setOrderID(orders.getNextID());
+                o.setOrderDate(date);
+                o.setCustomerID(custId);
+                for (int i = 0; i < count; i++) {
+                    int pid = getValidatedInt("Enter Product ID: ");
+                    Product* p = products.GetProduct(pid);
+                    if (p != NULL) {
+                        o.addProduct(*p);
+                    } else {
+                        cout << "Product not found! Skipping...\n";
+                    }
+                }
+                orders.Add(o);
+                cout << "Assigned Order ID: " << o.getOrderID() << endl;
+                cout << "\n--- Order Created ---\n";
+                o.displayDetails();
             }
-            orders.Add(o);
-            cout << "\n--- Order Created ---\n";
-            o.displayDetails();
             break;
         case 2:
             cout << "\n--- Remove Order ---\n";
-            cout << "Enter Order ID to remove: ";
-            cin >> id;
-            orders.Remove(id);
+            id = getValidatedInt("Enter Order ID to remove: ");
+            if (orders.FindByID(id) == -1) {
+                cout << "Order not found!\n";
+            } else {
+                orders.Remove(id);
+            }
             break;
         case 3:
             cout << "\n--- Update Order Status ---\n";
-            cout << "Enter Order ID to update: ";
-            cin >> id;
-            orders.Update(id);
+            id = getValidatedInt("Enter Order ID to update: ");
+            if (orders.FindByID(id) == -1) {
+                cout << "Order not found!\n";
+            } else {
+                orders.Update(id);
+            }
             break;
         case 4:
             cout << "\n--- Search Order ---\n";
-            cout << "Enter Order ID to search: ";
-            cin >> id;
+            id = getValidatedInt("Enter Order ID to search: ");
             {
                 Order* o = orders.GetOrder(id);
                 if (o != NULL) {
@@ -1468,8 +1697,6 @@ void orderMenu() {
         case 6:
             cout << "Returning to Main Menu...\n";
             break;
-        default:
-            cout << "Invalid choice!\n";
         }
     } while (choice != 6);
 }
@@ -1993,6 +2220,12 @@ void shipmentMenu() {
 int main() {
     int choice;
 
+    cout << "Loading data from CSV files...\n";
+    customers.loadFromCSV("customers.csv");
+    products.loadFromCSV("products.csv");
+    orders.loadFromCSV("orders.csv");
+    cout << "Data loaded successfully.\n";
+
     do {
         cout << "\n========================================\n";
         cout << "  WAREHOUSE MANAGEMENT SYSTEM\n";
@@ -2007,12 +2240,7 @@ int main() {
         cout << "8. Manage Inventory\n";
         cout << "9. Manage Shipment\n";
         cout << "0. Exit\n";
-        cout << "Enter your choice: ";
-        if (!(cin >> choice)) {
-            clearInputBuffer();
-            cout << "Invalid input! Please enter a number.\n";
-            continue;
-        }
+        choice = getValidatedMenuChoice(0, 9);
 
         switch (choice) {
         case 1:
@@ -2043,10 +2271,12 @@ int main() {
             shipmentMenu();
             break;
         case 0:
-            cout << "Exiting program...\n";
+            cout << "\nSaving data to CSV files...\n";
+            customers.saveToCSV("customers.csv");
+            products.saveToCSV("products.csv");
+            orders.saveToCSV("orders.csv");
+            cout << "Data saved successfully. Exiting program...\n";
             break;
-        default:
-            cout << "Invalid choice!\n";
         }
     } while (choice != 0);
 
