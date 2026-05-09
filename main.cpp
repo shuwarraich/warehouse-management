@@ -17,7 +17,8 @@ int getValidatedInt(const string& prompt) {
         if (cin >> value) {
             clearInputBuffer();
             return value;
-        } else {
+        }
+        else {
             cout << "Invalid input. Please enter an integer.\n";
             clearInputBuffer();
         }
@@ -31,7 +32,8 @@ float getValidatedFloat(const string& prompt) {
         if (cin >> value) {
             clearInputBuffer();
             return value;
-        } else {
+        }
+        else {
             cout << "Invalid input. Please enter a number.\n";
             clearInputBuffer();
         }
@@ -45,7 +47,8 @@ int getValidatedMenuChoice(int low, int high) {
         if (cin >> choice && choice >= low && choice <= high) {
             clearInputBuffer();
             return choice;
-        } else {
+        }
+        else {
             cout << "Invalid choice. Please enter a number between " << low << " and " << high << ".\n";
             clearInputBuffer();
         }
@@ -150,7 +153,7 @@ public:
 
     void display() {
         cout << "ID: " << productID << " | Name: " << productName
-             << " | Price: $" << price << " | Stock: " << quantityInStock << endl;
+            << " | Price: $" << price << " | Stock: " << quantityInStock << endl;
     }
 
     void displayDetails() {
@@ -207,7 +210,7 @@ public:
 
     void display() {
         cout << "ID: " << orderID << " | Date: " << orderDate
-             << " | Customer: " << customerID << " | Status: " << orderStatus << endl;
+            << " | Customer: " << customerID << " | Status: " << orderStatus << endl;
     }
 
     void displayDetails() {
@@ -315,7 +318,7 @@ public:
 
     void display() {
         cout << "ID: " << categoryID << " | Name: " << categoryName
-             << " | Description: " << description << endl;
+            << " | Description: " << description << endl;
     }
 
     void displayDetails() {
@@ -446,7 +449,8 @@ public:
             customers[count] = c;
             count++;
             cout << "Customer added successfully! (Total: " << count << ")" << endl;
-        } else {
+        }
+        else {
             cout << "Collection is full!" << endl;
         }
     }
@@ -459,7 +463,8 @@ public:
             }
             count--;
             cout << "Customer removed successfully!" << endl;
-        } else {
+        }
+        else {
             cout << "Customer not found!" << endl;
         }
     }
@@ -480,7 +485,8 @@ public:
             c.setAddress(addr);
             customers[index] = c;
             cout << "Customer updated successfully!" << endl;
-        } else {
+        }
+        else {
             cout << "Customer not found!" << endl;
         }
     }
@@ -567,10 +573,10 @@ public:
         file << "ID,Name,Contact,Email,Address\n";
         for (int i = 0; i < count; i++) {
             file << customers[i].getID() << ","
-                 << customers[i].getName() << ","
-                 << customers[i].getContact() << ","
-                 << customers[i].getEmail() << ","
-                 << customers[i].getAddress() << "\n";
+                << customers[i].getName() << ","
+                << customers[i].getContact() << ","
+                << customers[i].getEmail() << ","
+                << customers[i].getAddress() << "\n";
         }
         file.close();
         cout << "Saved " << count << " customers to " << filename << ".\n";
@@ -600,7 +606,8 @@ public:
             products[count] = p;
             count++;
             cout << "Product added successfully! (Total: " << count << ")" << endl;
-        } else {
+        }
+        else {
             cout << "Collection is full!" << endl;
         }
     }
@@ -613,7 +620,8 @@ public:
             }
             count--;
             cout << "Product removed successfully!" << endl;
-        } else {
+        }
+        else {
             cout << "Product not found!" << endl;
         }
     }
@@ -638,7 +646,8 @@ public:
             p.setDescription(desc);
             products[index] = p;
             cout << "Product updated successfully!" << endl;
-        } else {
+        }
+        else {
             cout << "Product not found!" << endl;
         }
     }
@@ -727,11 +736,11 @@ public:
         file << "ProductID,ProductName,CategoryID,Price,Quantity,Description\n";
         for (int i = 0; i < count; i++) {
             file << products[i].getProductID() << ","
-                 << products[i].getProductName() << ","
-                 << products[i].getCategoryID() << ","
-                 << products[i].getPrice() << ","
-                 << products[i].getQuantity() << ","
-                 << products[i].getDescription() << "\n";
+                << products[i].getProductName() << ","
+                << products[i].getCategoryID() << ","
+                << products[i].getPrice() << ","
+                << products[i].getQuantity() << ","
+                << products[i].getDescription() << "\n";
         }
         file.close();
         cout << "Saved " << count << " products to " << filename << ".\n";
@@ -761,7 +770,8 @@ public:
             orders[count] = o;
             count++;
             cout << "Order added successfully! (Total: " << count << ")" << endl;
-        } else {
+        }
+        else {
             cout << "Collection is full!" << endl;
         }
     }
@@ -774,7 +784,8 @@ public:
             }
             count--;
             cout << "Order removed successfully!" << endl;
-        } else {
+        }
+        else {
             cout << "Order not found!" << endl;
         }
     }
@@ -785,7 +796,8 @@ public:
             string status = getStringInput("Enter new status: ");
             orders[index].setOrderStatus(status);
             cout << "Order updated successfully!" << endl;
-        } else {
+        }
+        else {
             cout << "Order not found!" << endl;
         }
     }
@@ -872,13 +884,234 @@ public:
         file << "OrderID,OrderDate,CustomerID,TotalAmount,OrderStatus\n";
         for (int i = 0; i < count; i++) {
             file << orders[i].getOrderID() << ","
-                 << orders[i].getOrderDate() << ","
-                 << orders[i].getCustomerID() << ","
-                 << orders[i].getTotalAmount() << ","
-                 << orders[i].getOrderStatus() << "\n";
+                << orders[i].getOrderDate() << ","
+                << orders[i].getCustomerID() << ","
+                << orders[i].getTotalAmount() << ","
+                << orders[i].getOrderStatus() << "\n";
         }
         file.close();
         cout << "Saved " << count << " orders to " << filename << ".\n";
+    }
+};
+
+class CategoryCollection {
+private:
+    Category categories[100];
+    int count;
+    int nextID;
+
+public:
+    CategoryCollection() {
+        count = 0;
+        nextID = 1;
+    }
+
+    int getNextID() {
+        return nextID++;
+    }
+
+    void Add(Category c) {
+
+        if (FindByID(c.getCategoryID()) != -1) {
+            cout << "Error: Category with ID already exists!" << endl;
+            return;
+        }
+
+        if (count < 100) {
+            categories[count] = c;
+            count++;
+
+            cout << "Category added successfully! (Total: "
+                << count << ")" << endl;
+
+        }
+        else {
+            cout << "Collection is full!" << endl;
+        }
+    }
+
+    void Remove(int id) {
+
+        int index = FindByID(id);
+
+        if (index != -1) {
+
+            for (int i = index; i < count - 1; i++) {
+                categories[i] = categories[i + 1];
+            }
+
+            count--;
+
+            cout << "Category removed successfully!" << endl;
+
+        }
+        else {
+            cout << "Category not found!" << endl;
+        }
+    }
+
+    void Update(int id) {
+
+        int index = FindByID(id);
+
+        if (index != -1) {
+
+            Category c;
+
+            string name, desc;
+
+            name = getStringInput("Enter new Category Name: ");
+            desc = getStringInput("Enter new Description: ");
+
+            c.setCategoryID(categories[index].getCategoryID());
+            c.setCategoryName(name);
+            c.setDescription(desc);
+
+            categories[index] = c;
+
+            cout << "Category updated successfully!" << endl;
+
+        }
+        else {
+            cout << "Category not found!" << endl;
+        }
+    }
+
+    void DisplayAll() {
+
+        if (count == 0) {
+            cout << "No categories in collection!" << endl;
+            return;
+        }
+
+        cout << "\n========== ALL CATEGORIES ==========" << endl;
+
+        for (int i = 0; i < count; i++) {
+            categories[i].display();
+        }
+
+        cout << "====================================" << endl;
+    }
+
+    int FindByID(int id) {
+
+        for (int i = 0; i < count; i++) {
+
+            if (categories[i].getCategoryID() == id) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    Category* GetCategory(int id) {
+
+        int index = FindByID(id);
+
+        if (index != -1) {
+            return &categories[index];
+        }
+
+        return NULL;
+    }
+
+    int getCount() {
+        return count;
+    }
+
+    void loadFromCSV(const string& filename) {
+
+        ifstream file(filename);
+
+        if (!file.is_open()) {
+            cerr << "Warning: Could not open "
+                << filename
+                << ". Starting with empty collection.\n";
+            return;
+        }
+
+        string line;
+
+        bool headerSkipped = false;
+
+        while (getline(file, line)) {
+
+            if (line.empty()) continue;
+
+            if (!headerSkipped) {
+
+                if (line.find("ID") != string::npos ||
+                    line.find("id") != string::npos) {
+
+                    headerSkipped = true;
+                    continue;
+                }
+
+                headerSkipped = true;
+            }
+
+            stringstream ss(line);
+
+            string idStr, name, desc;
+
+            if (getline(ss, idStr, ',') &&
+                getline(ss, name, ',') &&
+                getline(ss, desc, ',')) {
+
+                Category c;
+
+                int loadedID = stoi(idStr);
+
+                c.setCategoryID(loadedID);
+                c.setCategoryName(name);
+                c.setDescription(desc);
+
+                categories[count] = c;
+
+                count++;
+
+                if (loadedID >= nextID) {
+                    nextID = loadedID + 1;
+                }
+            }
+        }
+
+        file.close();
+
+        cout << "Loaded "
+            << count
+            << " categories from "
+            << filename
+            << ".\n";
+    }
+
+    void saveToCSV(const string& filename) {
+
+        ofstream file(filename);
+
+        if (!file.is_open()) {
+            cerr << "Error: Could not write to "
+                << filename << endl;
+            return;
+        }
+
+        file << "ID,Name,Description\n";
+
+        for (int i = 0; i < count; i++) {
+
+            file << categories[i].getCategoryID() << ","
+                << categories[i].getCategoryName() << ","
+                << categories[i].getDescription() << "\n";
+        }
+
+        file.close();
+
+        cout << "Saved "
+            << count
+            << " categories to "
+            << filename
+            << ".\n";
     }
 };
 
@@ -886,266 +1119,526 @@ class EmployeeCollection {
 private:
     Employee employees[100];
     int count;
+    int nextID;
 
 public:
-    EmployeeCollection() { count = 0; }
+    EmployeeCollection() {
+
+        count = 0;
+        nextID = 1;
+    }
+
+    int getNextID() {
+        return nextID++;
+    }
 
     void Add(Employee e) {
+
+        if (FindByID(e.getID()) != -1) {
+
+            cout << "Error: Employee with ID "
+                << e.getID()
+                << " already exists!" << endl;
+
+            return;
+        }
+
         if (count < 100) {
+
             employees[count] = e;
+
             count++;
-            cout << "Employee added successfully! (Total: " << count << ")" << endl;
-        } else {
+
+            cout << "Employee added successfully! (Total: "
+                << count << ")" << endl;
+
+        }
+        else {
+
             cout << "Collection is full!" << endl;
         }
     }
 
     void Remove(int id) {
+
         int index = FindByID(id);
+
         if (index != -1) {
+
             for (int i = index; i < count - 1; i++) {
                 employees[i] = employees[i + 1];
             }
+
             count--;
+
             cout << "Employee removed successfully!" << endl;
-        } else {
+
+        }
+        else {
+
             cout << "Employee not found!" << endl;
         }
     }
 
     void Update(int id) {
+
         int index = FindByID(id);
+
         if (index != -1) {
+
             Employee e;
-            int eid;
-            string name, contact, email, position, city;
-            cout << "Enter new Employee ID: ";
-            cin >> eid;
-            clearInputBuffer();
+
+            string name, contact, email, city, position;
+
             name = getStringInput("Enter new Name: ");
             contact = getStringInput("Enter new Contact: ");
             email = getStringInput("Enter new Email: ");
-            position = getStringInput("Enter new Position: ");
             city = getStringInput("Enter new City: ");
-            e.setID(eid);
+            position = getStringInput("Enter new Position: ");
+
+            e.setID(employees[index].getID());
             e.setName(name);
             e.setContact(contact);
             e.setEmail(email);
-            e.setPosition(position);
             e.setCity(city);
+            e.setPosition(position);
+
             employees[index] = e;
+
             cout << "Employee updated successfully!" << endl;
-        } else {
+
+        }
+        else {
+
             cout << "Employee not found!" << endl;
         }
     }
 
     void DisplayAll() {
+
         if (count == 0) {
+
             cout << "No employees in collection!" << endl;
             return;
         }
+
         cout << "\n========== ALL EMPLOYEES ==========" << endl;
+
         for (int i = 0; i < count; i++) {
+
             employees[i].display();
             cout << endl;
         }
     }
 
     int FindByID(int id) {
+
         for (int i = 0; i < count; i++) {
+
             if (employees[i].getID() == id) {
                 return i;
             }
         }
+
         return -1;
     }
 
     Employee* GetEmployee(int id) {
+
         int index = FindByID(id);
+
         if (index != -1) {
             return &employees[index];
         }
+
         return NULL;
     }
 
-    int getCount() { return count; }
+    int getCount() {
+        return count;
+    }
+
+    void loadFromCSV(const string& filename) {
+
+        ifstream file(filename);
+
+        if (!file.is_open()) {
+
+            cerr << "Warning: Could not open "
+                << filename
+                << ". Starting with empty collection.\n";
+
+            return;
+        }
+
+        string line;
+
+        bool headerSkipped = false;
+
+        while (getline(file, line)) {
+
+            if (line.empty()) continue;
+
+            if (!headerSkipped) {
+
+                if (line.find("ID") != string::npos ||
+                    line.find("id") != string::npos) {
+
+                    headerSkipped = true;
+                    continue;
+                }
+
+                headerSkipped = true;
+            }
+
+            stringstream ss(line);
+
+            string idStr, name, contact,
+                email, city, position;
+
+            if (getline(ss, idStr, ',') &&
+                getline(ss, name, ',') &&
+                getline(ss, contact, ',') &&
+                getline(ss, email, ',') &&
+                getline(ss, city, ',') &&
+                getline(ss, position, ',')) {
+
+                Employee e;
+
+                int loadedID = stoi(idStr);
+
+                e.setID(loadedID);
+                e.setName(name);
+                e.setContact(contact);
+                e.setEmail(email);
+                e.setCity(city);
+                e.setPosition(position);
+
+                employees[count] = e;
+
+                count++;
+
+                if (loadedID >= nextID) {
+                    nextID = loadedID + 1;
+                }
+            }
+        }
+
+        file.close();
+
+        cout << "Loaded "
+            << count
+            << " employees from "
+            << filename
+            << ".\n";
+    }
+
+    void saveToCSV(const string& filename) {
+
+        ofstream file(filename);
+
+        if (!file.is_open()) {
+
+            cerr << "Error: Could not write to "
+                << filename << endl;
+
+            return;
+        }
+
+        file << "ID,Name,Contact,Email,City,Position\n";
+
+        for (int i = 0; i < count; i++) {
+
+            file << employees[i].getID() << ","
+                << employees[i].getName() << ","
+                << employees[i].getContact() << ","
+                << employees[i].getEmail() << ","
+                << employees[i].getCity() << ","
+                << employees[i].getPosition() << "\n";
+        }
+
+        file.close();
+
+        cout << "Saved "
+            << count
+            << " employees to "
+            << filename
+            << ".\n";
+    }
 };
 
 class SupplierCollection {
 private:
+
     Supplier suppliers[100];
+    Address addresses[100];
+
     int count;
+    int nextID;
 
 public:
-    SupplierCollection() { count = 0; }
 
-    void Add(Supplier s) {
+    SupplierCollection() {
+
+        count = 0;
+        nextID = 1;
+    }
+
+    int getNextID() {
+        return nextID++;
+    }
+
+    void Add(Supplier s, Address a) {
+
+        if (FindByID(s.getID()) != -1) {
+
+            cout << "Error: Supplier with ID "
+                << s.getID()
+                << " already exists!" << endl;
+
+            return;
+        }
+
         if (count < 100) {
+
+            addresses[count] = a;
+
+            s.setAddress(&addresses[count]);
+
             suppliers[count] = s;
+
             count++;
-            cout << "Supplier added successfully! (Total: " << count << ")" << endl;
-        } else {
+
+            cout << "Supplier added successfully! (Total: "
+                << count << ")" << endl;
+
+        }
+        else {
+
             cout << "Collection is full!" << endl;
         }
     }
 
     void Remove(int id) {
+
         int index = FindByID(id);
+
         if (index != -1) {
+
             for (int i = index; i < count - 1; i++) {
+
                 suppliers[i] = suppliers[i + 1];
+                addresses[i] = addresses[i + 1];
             }
+
             count--;
+
             cout << "Supplier removed successfully!" << endl;
-        } else {
+
+        }
+        else {
+
             cout << "Supplier not found!" << endl;
         }
     }
 
     void Update(int id) {
+
         int index = FindByID(id);
+
         if (index != -1) {
+
             Supplier s;
-            int sid;
-            string name, contact, email, company, city;
-            cout << "Enter new Supplier ID: ";
-            cin >> sid;
-            clearInputBuffer();
+            Address a;
+
+            string name, contact, email,
+                company, city;
+
             name = getStringInput("Enter new Name: ");
             contact = getStringInput("Enter new Contact: ");
             email = getStringInput("Enter new Email: ");
-            company = getStringInput("Enter new Company: ");
+            company = getStringInput("Enter new Company Name: ");
             city = getStringInput("Enter new City: ");
-            s.setID(sid);
+
+            a.setCity(city);
+
+            s.setID(suppliers[index].getID());
             s.setName(name);
             s.setContact(contact);
             s.setEmail(email);
             s.setCompanyName(company);
-            Address* addr = new Address();
-            addr->setCity(city);
-            s.setAddress(addr);
+
+            addresses[index] = a;
+
+            s.setAddress(&addresses[index]);
+
             suppliers[index] = s;
+
             cout << "Supplier updated successfully!" << endl;
-        } else {
+
+        }
+        else {
+
             cout << "Supplier not found!" << endl;
         }
     }
 
     void DisplayAll() {
+
         if (count == 0) {
+
             cout << "No suppliers in collection!" << endl;
             return;
         }
+
         cout << "\n========== ALL SUPPLIERS ==========" << endl;
+
         for (int i = 0; i < count; i++) {
+
             suppliers[i].display();
             cout << endl;
         }
     }
 
     int FindByID(int id) {
+
         for (int i = 0; i < count; i++) {
+
             if (suppliers[i].getID() == id) {
                 return i;
             }
         }
+
         return -1;
     }
 
     Supplier* GetSupplier(int id) {
+
         int index = FindByID(id);
+
         if (index != -1) {
             return &suppliers[index];
         }
+
         return NULL;
     }
 
-    int getCount() { return count; }
-};
-
-class CategoryCollection {
-private:
-    Category categories[100];
-    int count;
-
-public:
-    CategoryCollection() { count = 0; }
-
-    void Add(Category c) {
-        if (count < 100) {
-            categories[count] = c;
-            count++;
-            cout << "Category added successfully! (Total: " << count << ")" << endl;
-        } else {
-            cout << "Collection is full!" << endl;
-        }
+    int getCount() {
+        return count;
     }
 
-    void Remove(int id) {
-        int index = FindByID(id);
-        if (index != -1) {
-            for (int i = index; i < count - 1; i++) {
-                categories[i] = categories[i + 1];
-            }
-            count--;
-            cout << "Category removed successfully!" << endl;
-        } else {
-            cout << "Category not found!" << endl;
-        }
-    }
+    void loadFromCSV(const string& filename) {
 
-    void Update(int id) {
-        int index = FindByID(id);
-        if (index != -1) {
-            Category c;
-            int cid;
-            string name, desc;
-            cout << "Enter new Category ID: ";
-            cin >> cid;
-            clearInputBuffer();
-            name = getStringInput("Enter new Name: ");
-            desc = getStringInput("Enter new Description: ");
-            c.setCategoryID(cid);
-            c.setCategoryName(name);
-            c.setDescription(desc);
-            categories[index] = c;
-            cout << "Category updated successfully!" << endl;
-        } else {
-            cout << "Category not found!" << endl;
-        }
-    }
+        ifstream file(filename);
 
-    void DisplayAll() {
-        if (count == 0) {
-            cout << "No categories in collection!" << endl;
+        if (!file.is_open()) {
+
+            cerr << "Warning: Could not open "
+                << filename
+                << ". Starting with empty collection.\n";
+
             return;
         }
-        cout << "\n========== ALL CATEGORIES ==========" << endl;
-        for (int i = 0; i < count; i++) {
-            categories[i].display();
-        }
-        cout << "===================================" << endl;
-    }
 
-    int FindByID(int id) {
-        for (int i = 0; i < count; i++) {
-            if (categories[i].getCategoryID() == id) {
-                return i;
+        string line;
+
+        bool headerSkipped = false;
+
+        while (getline(file, line)) {
+
+            if (line.empty()) continue;
+
+            if (!headerSkipped) {
+
+                if (line.find("ID") != string::npos ||
+                    line.find("id") != string::npos) {
+
+                    headerSkipped = true;
+                    continue;
+                }
+
+                headerSkipped = true;
+            }
+
+            stringstream ss(line);
+
+            string idStr, name, contact,
+                email, company, city;
+
+            if (getline(ss, idStr, ',') &&
+                getline(ss, name, ',') &&
+                getline(ss, contact, ',') &&
+                getline(ss, email, ',') &&
+                getline(ss, company, ',') &&
+                getline(ss, city, ',')) {
+
+                Supplier s;
+                Address a;
+
+                int loadedID = stoi(idStr);
+
+                a.setCity(city);
+
+                addresses[count] = a;
+
+                s.setID(loadedID);
+                s.setName(name);
+                s.setContact(contact);
+                s.setEmail(email);
+                s.setCompanyName(company);
+                s.setAddress(&addresses[count]);
+
+                suppliers[count] = s;
+
+                count++;
+
+                if (loadedID >= nextID) {
+                    nextID = loadedID + 1;
+                }
             }
         }
-        return -1;
+
+        file.close();
+
+        cout << "Loaded "
+            << count
+            << " suppliers from "
+            << filename
+            << ".\n";
     }
 
-    Category* GetCategory(int id) {
-        int index = FindByID(id);
-        if (index != -1) {
-            return &categories[index];
+    void saveToCSV(const string& filename) {
+
+        ofstream file(filename);
+
+        if (!file.is_open()) {
+
+            cerr << "Error: Could not write to "
+                << filename << endl;
+
+            return;
         }
-        return NULL;
-    }
 
-    int getCount() { return count; }
+        file << "ID,Name,Contact,Email,Company,City\n";
+
+        for (int i = 0; i < count; i++) {
+
+            file << suppliers[i].getID() << ","
+                << suppliers[i].getName() << ","
+                << suppliers[i].getContact() << ","
+                << suppliers[i].getEmail() << ","
+                << suppliers[i].getCompanyName() << ","
+                << addresses[i].getCity() << "\n";
+        }
+
+        file.close();
+
+        cout << "Saved "
+            << count
+            << " suppliers to "
+            << filename
+            << ".\n";
+    }
 };
 
 class WarehouseCollection {
@@ -1161,7 +1654,8 @@ public:
             warehouses[count] = w;
             count++;
             cout << "Warehouse added successfully! (Total: " << count << ")" << endl;
-        } else {
+        }
+        else {
             cout << "Collection is full!" << endl;
         }
     }
@@ -1174,7 +1668,8 @@ public:
             }
             count--;
             cout << "Warehouse removed successfully!" << endl;
-        } else {
+        }
+        else {
             cout << "Warehouse not found!" << endl;
         }
     }
@@ -1199,7 +1694,8 @@ public:
             w.setCapacity(cap);
             warehouses[index] = w;
             cout << "Warehouse updated successfully!" << endl;
-        } else {
+        }
+        else {
             cout << "Warehouse not found!" << endl;
         }
     }
@@ -1234,6 +1730,62 @@ public:
     }
 
     int getCount() { return count; }
+    void loadFromCSV(const string& filename) {
+        ifstream file(filename);
+
+        if (!file.is_open()) {
+            cout << "Could not open file: " << filename << endl;
+            return;
+        }
+
+        string line;
+        getline(file, line);
+
+        while (getline(file, line)) {
+            stringstream ss(line);
+            string temp;
+
+            Warehouse w;
+
+            getline(ss, temp, ',');
+            w.setID(stoi(temp));
+
+            getline(ss, temp, ',');
+            w.setName(temp);
+
+            getline(ss, temp, ',');
+            w.setLocation(temp);
+
+            getline(ss, temp, ',');
+            w.setCapacity(stoi(temp));
+
+            Add(w);
+        }
+
+        file.close();
+    }
+
+    void saveToCSV(const string& filename) {
+        ofstream file(filename);
+
+        if (!file.is_open()) {
+            cout << "Could not create file: " << filename << endl;
+            return;
+        }
+
+        file << "ID,Name,Location,Capacity\n";
+
+        for (int i = 0; i < count; i++) {
+            file << warehouses[i].getID() << ","
+                << warehouses[i].getName() << ","
+                << warehouses[i].getLocation() << ","
+                << warehouses[i].getCapacity() << "\n";
+        }
+
+        file.close();
+
+        cout << "Warehouse data saved successfully!" << endl;
+    }
 };
 
 class InventoryCollection {
@@ -1249,7 +1801,8 @@ public:
             inventoryItems[count] = inv;
             count++;
             cout << "Inventory item added successfully! (Total: " << count << ")" << endl;
-        } else {
+        }
+        else {
             cout << "Collection is full!" << endl;
         }
     }
@@ -1262,7 +1815,8 @@ public:
             }
             count--;
             cout << "Inventory item removed successfully!" << endl;
-        } else {
+        }
+        else {
             cout << "Inventory item not found!" << endl;
         }
     }
@@ -1304,7 +1858,8 @@ public:
             inv.setDescription(desc);
             inventoryItems[index] = inv;
             cout << "Inventory updated successfully!" << endl;
-        } else {
+        }
+        else {
             cout << "Inventory item not found!" << endl;
         }
     }
@@ -1339,6 +1894,82 @@ public:
     }
 
     int getCount() { return count; }
+    void loadFromCSV(const string& filename) {
+        ifstream file(filename);
+
+        if (!file.is_open()) {
+            cout << "Could not open file: " << filename << endl;
+            return;
+        }
+
+        string line;
+        getline(file, line);
+
+        while (getline(file, line)) {
+            stringstream ss(line);
+            string temp;
+
+            Inventory inv;
+
+            getline(ss, temp, ',');
+            inv.setID(stoi(temp));
+
+            getline(ss, temp, ',');
+            inv.setName(temp);
+
+            getline(ss, temp, ',');
+            inv.setLocation(temp);
+
+            getline(ss, temp, ',');
+            inv.setCapacity(stoi(temp));
+
+            getline(ss, temp, ',');
+            inv.setItemID(stoi(temp));
+
+            getline(ss, temp, ',');
+            inv.setItemName(temp);
+
+            getline(ss, temp, ',');
+            inv.setPrice(stod(temp));
+
+            getline(ss, temp, ',');
+            inv.setQuantity(stoi(temp));
+
+            getline(ss, temp, ',');
+            inv.setDescription(temp);
+
+            Add(inv);
+        }
+
+        file.close();
+    }
+
+    void saveToCSV(const string& filename) {
+        ofstream file(filename);
+
+        if (!file.is_open()) {
+            cout << "Could not create file: " << filename << endl;
+            return;
+        }
+
+        file << "WarehouseID,WarehouseName,Location,Capacity,ItemID,ItemName,Price,Quantity,Description\n";
+
+        for (int i = 0; i < count; i++) {
+            file << inventoryItems[i].getID() << ","
+                << inventoryItems[i].getName() << ","
+                << inventoryItems[i].getLocation() << ","
+                << inventoryItems[i].getCapacity() << ","
+                << inventoryItems[i].getItemID() << ","
+                << inventoryItems[i].getItemName() << ","
+                << inventoryItems[i].getPrice() << ","
+                << inventoryItems[i].getQuantity() << ","
+                << inventoryItems[i].getDescription() << "\n";
+        }
+
+        file.close();
+
+        cout << "Inventory data saved successfully!" << endl;
+    }
 };
 
 class ShipmentCollection {
@@ -1354,7 +1985,8 @@ public:
             shipments[count] = ship;
             count++;
             cout << "Shipment added successfully! (Total: " << count << ")" << endl;
-        } else {
+        }
+        else {
             cout << "Collection is full!" << endl;
         }
     }
@@ -1367,7 +1999,8 @@ public:
             }
             count--;
             cout << "Shipment removed successfully!" << endl;
-        } else {
+        }
+        else {
             cout << "Shipment not found!" << endl;
         }
     }
@@ -1413,7 +2046,8 @@ public:
             ship.setStatus(status);
             shipments[index] = ship;
             cout << "Shipment updated successfully!" << endl;
-        } else {
+        }
+        else {
             cout << "Shipment not found!" << endl;
         }
     }
@@ -1448,6 +2082,87 @@ public:
     }
 
     int getCount() { return count; }
+    void loadFromCSV(const string& filename) {
+        ifstream file(filename);
+
+        if (!file.is_open()) {
+            cout << "Could not open file: " << filename << endl;
+            return;
+        }
+
+        string line;
+        getline(file, line);
+
+        while (getline(file, line)) {
+            stringstream ss(line);
+            string temp;
+
+            Shipment ship;
+
+            getline(ss, temp, ',');
+            ship.setShipmentID(stoi(temp));
+
+            getline(ss, temp, ',');
+            ship.setID(stoi(temp));
+
+            getline(ss, temp, ',');
+            ship.setName(temp);
+
+            getline(ss, temp, ',');
+            ship.setLocation(temp);
+
+            getline(ss, temp, ',');
+            ship.setCapacity(stoi(temp));
+
+            getline(ss, temp, ',');
+            ship.setItemID(stoi(temp));
+
+            getline(ss, temp, ',');
+            ship.setItemName(temp);
+
+            getline(ss, temp, ',');
+            ship.setPrice(stod(temp));
+
+            getline(ss, temp, ',');
+            ship.setQuantity(stoi(temp));
+
+            getline(ss, temp, ',');
+            ship.setStatus(temp);
+
+            Add(ship);
+        }
+
+        file.close();
+    }
+
+    void saveToCSV(const string& filename) {
+        ofstream file(filename);
+
+        if (!file.is_open()) {
+            cout << "Could not create file: " << filename << endl;
+            return;
+        }
+
+        file << "ShipmentID,WarehouseID,WarehouseName,Location,Capacity,ItemID,ItemName,Price,Quantity,Status\n";
+
+        for (int i = 0; i < count; i++) {
+            file << shipments[i].getShipmentID() << ","
+                << shipments[i].getID() << ","
+                << shipments[i].getName() << ","
+                << shipments[i].getLocation() << ","
+                << shipments[i].getCapacity() << ","
+                << shipments[i].getItemID() << ","
+                << shipments[i].getItemName() << ","
+                << shipments[i].getPrice() << ","
+                << shipments[i].getQuantity() << ","
+                << shipments[i].getStatus() << "\n";
+        }
+
+        file.close();
+
+        cout << "Shipment data saved successfully!" << endl;
+    }
+
 };
 
 CustomerCollection customers;
@@ -1500,7 +2215,8 @@ void customerMenu() {
             id = getValidatedInt("Enter Customer ID to remove: ");
             if (customers.FindByID(id) == -1) {
                 cout << "Customer not found!\n";
-            } else {
+            }
+            else {
                 customers.Remove(id);
             }
             break;
@@ -1509,7 +2225,8 @@ void customerMenu() {
             id = getValidatedInt("Enter Customer ID to update: ");
             if (customers.FindByID(id) == -1) {
                 cout << "Customer not found!\n";
-            } else {
+            }
+            else {
                 customers.Update(id);
             }
             break;
@@ -1520,7 +2237,8 @@ void customerMenu() {
                 Customer* c = customers.GetCustomer(id);
                 if (c != NULL) {
                     c->display();
-                } else {
+                }
+                else {
                     cout << "Customer not found!" << endl;
                 }
             }
@@ -1578,7 +2296,8 @@ void productMenu() {
             id = getValidatedInt("Enter Product ID to remove: ");
             if (products.FindByID(id) == -1) {
                 cout << "Product not found!\n";
-            } else {
+            }
+            else {
                 products.Remove(id);
             }
             break;
@@ -1587,7 +2306,8 @@ void productMenu() {
             id = getValidatedInt("Enter Product ID to update: ");
             if (products.FindByID(id) == -1) {
                 cout << "Product not found!\n";
-            } else {
+            }
+            else {
                 products.Update(id);
             }
             break;
@@ -1598,7 +2318,8 @@ void productMenu() {
                 Product* p = products.GetProduct(id);
                 if (p != NULL) {
                     p->displayDetails();
-                } else {
+                }
+                else {
                     cout << "Product not found!" << endl;
                 }
             }
@@ -1651,7 +2372,8 @@ void orderMenu() {
                     Product* p = products.GetProduct(pid);
                     if (p != NULL) {
                         o.addProduct(*p);
-                    } else {
+                    }
+                    else {
                         cout << "Product not found! Skipping...\n";
                     }
                 }
@@ -1666,7 +2388,8 @@ void orderMenu() {
             id = getValidatedInt("Enter Order ID to remove: ");
             if (orders.FindByID(id) == -1) {
                 cout << "Order not found!\n";
-            } else {
+            }
+            else {
                 orders.Remove(id);
             }
             break;
@@ -1675,7 +2398,8 @@ void orderMenu() {
             id = getValidatedInt("Enter Order ID to update: ");
             if (orders.FindByID(id) == -1) {
                 cout << "Order not found!\n";
-            } else {
+            }
+            else {
                 orders.Update(id);
             }
             break;
@@ -1686,7 +2410,8 @@ void orderMenu() {
                 Order* o = orders.GetOrder(id);
                 if (o != NULL) {
                     o->displayDetails();
-                } else {
+                }
+                else {
                     cout << "Order not found!" << endl;
                 }
             }
@@ -1765,7 +2490,8 @@ void employeeMenu() {
                 Employee* e = employees.GetEmployee(id);
                 if (e != NULL) {
                     e->display();
-                } else {
+                }
+                else {
                     cout << "Employee not found!" << endl;
                 }
             }
@@ -1807,6 +2533,7 @@ void supplierMenu() {
 
         switch (choice) {
         case 1:
+        {
             cout << "\n--- Add Supplier ---\n";
             cout << "Enter Supplier ID: ";
             cin >> id;
@@ -1828,8 +2555,10 @@ void supplierMenu() {
             }
             cout << "\n--- Supplier Information ---\n";
             s.display();
-            suppliers.Add(s);
+            Address a;
+            suppliers.Add(s, a);
             break;
+        }
         case 2:
             cout << "\n--- Remove Supplier ---\n";
             cout << "Enter Supplier ID to remove: ";
@@ -1850,7 +2579,8 @@ void supplierMenu() {
                 Supplier* s = suppliers.GetSupplier(id);
                 if (s != NULL) {
                     s->display();
-                } else {
+                }
+                else {
                     cout << "Supplier not found!" << endl;
                 }
             }
@@ -1925,7 +2655,8 @@ void categoryMenu() {
                 Category* c = categories.GetCategory(id);
                 if (c != NULL) {
                     c->displayDetails();
-                } else {
+                }
+                else {
                     cout << "Category not found!" << endl;
                 }
             }
@@ -2004,7 +2735,8 @@ void warehouseMenu() {
                 Warehouse* w = warehouses.GetWarehouse(id);
                 if (w != NULL) {
                     w->display();
-                } else {
+                }
+                else {
                     cout << "Warehouse not found!" << endl;
                 }
             }
@@ -2100,7 +2832,8 @@ void inventoryMenu() {
                 Inventory* inv = inventoryItems.GetInventory(itemID);
                 if (inv != NULL) {
                     inv->display();
-                } else {
+                }
+                else {
                     cout << "Inventory item not found!" << endl;
                 }
             }
@@ -2200,7 +2933,8 @@ void shipmentMenu() {
                 Shipment* ship = shipments.GetShipment(shipID);
                 if (ship != NULL) {
                     ship->display();
-                } else {
+                }
+                else {
                     cout << "Shipment not found!" << endl;
                 }
             }
@@ -2224,6 +2958,9 @@ int main() {
     customers.loadFromCSV("customers.csv");
     products.loadFromCSV("products.csv");
     orders.loadFromCSV("orders.csv");
+    warehouses.loadFromCSV("warehouse.csv");
+    inventoryItems.loadFromCSV("inventory.csv");
+    shipments.loadFromCSV("shipment.csv");
     cout << "Data loaded successfully.\n";
 
     do {
@@ -2275,6 +3012,9 @@ int main() {
             customers.saveToCSV("customers.csv");
             products.saveToCSV("products.csv");
             orders.saveToCSV("orders.csv");
+            warehouses.saveToCSV("warehouse.csv");
+            inventoryItems.saveToCSV("inventory.csv");
+            shipments.saveToCSV("shipment.csv");
             cout << "Data saved successfully. Exiting program...\n";
             break;
         }
@@ -2282,3 +3022,4 @@ int main() {
 
     return 0;
 }
+
