@@ -124,7 +124,6 @@ private:
     string productName;
     int categoryID;
     float price;
-    int quantityInStock;
     string description;
 
 public:
@@ -133,7 +132,6 @@ public:
         productName = "";
         categoryID = 0;
         price = 0.00;
-        quantityInStock = 0;
         description = "";
     }
 
@@ -141,19 +139,17 @@ public:
     void setProductName(string n) { productName = n; }
     void setCategoryID(int cid) { categoryID = cid; }
     void setPrice(float p) { price = p; }
-    void setQuantity(int q) { quantityInStock = q; }
     void setDescription(string desc) { description = desc; }
 
     int getProductID() { return productID; }
     string getProductName() { return productName; }
     int getCategoryID() { return categoryID; }
     float getPrice() { return price; }
-    int getQuantity() { return quantityInStock; }
     string getDescription() { return description; }
 
     void display() {
         cout << "ID: " << productID << " | Name: " << productName
-            << " | Price: $" << price << " | Stock: " << quantityInStock << endl;
+            << " | Price: $" << price << endl;
     }
 
     void displayDetails() {
@@ -162,13 +158,13 @@ public:
         cout << "Name: " << productName << endl;
         cout << "Category ID: " << categoryID << endl;
         cout << "Price: $" << price << endl;
-        cout << "Stock: " << quantityInStock << endl;
         cout << "Description: " << description << endl;
         cout << "======================================" << endl;
     }
 };
 
 class Order {
+    friend class OrderCollection;
 private:
     int orderID;
     string orderDate;
@@ -177,6 +173,7 @@ private:
     int productCount;
     float totalAmount;
     string orderStatus;
+    void setTotalAmount(float amount) { totalAmount = amount; }
 
 public:
     Order() {
@@ -192,7 +189,6 @@ public:
     void setOrderDate(string d) { orderDate = d; }
     void setCustomerID(int cid) { customerID = cid; }
     void setOrderStatus(string status) { orderStatus = status; }
-    void setTotalAmount(float amount) { totalAmount = amount; }
     void addProduct(Product p) {
         if (productCount < 50) {
             products[productCount] = p;
@@ -369,38 +365,19 @@ public:
 
 class Inventory : public Warehouse {
 protected:
-    int itemID;
-    string itemName;
+    int productID;
     int quantity;
-    double price;
-    string description;
 
 public:
     Inventory() : Warehouse() {
-        itemID = 0; itemName = ""; quantity = 0; price = 0.0; description = "";
+        productID = 0; quantity = 0;
     }
-    void setItemID(int id) { itemID = id; }
-    void setItemName(string n) { itemName = n; }
+    void setProductID(int id) { productID = id; }
     void setQuantity(int q) { quantity = q; }
-    void setPrice(double p) { price = p; }
-    void setDescription(string d) { description = d; }
-    int getItemID() { return itemID; }
-    string getItemName() { return itemName; }
+    int getProductID() { return productID; }
     int getQuantity() { return quantity; }
-    double getPrice() { return price; }
-    string getDescription() { return description; }
 
-    void display() {
-        cout << "========== INVENTORY ITEM ==========" << endl;
-        displayEntity();
-        cout << "Location: " << location << endl;
-        cout << "Item ID: " << itemID << endl;
-        cout << "Item Name: " << itemName << endl;
-        cout << "Price: $" << price << endl;
-        cout << "Quantity: " << quantity << endl;
-        cout << "Description: " << description << endl;
-        cout << "====================================" << endl;
-    }
+    void display();
 };
 
 class Shipment : public Inventory {
@@ -415,15 +392,7 @@ public:
     int getShipmentID() { return shipmentID; }
     string getStatus() { return status; }
 
-    void display() {
-        cout << "========== SHIPMENT DETAILS ==========" << endl;
-        cout << "Shipment ID: " << shipmentID << endl;
-        displayEntity();
-        cout << "Item: " << itemName << endl;
-        cout << "Quantity: " << quantity << endl;
-        cout << "Status: " << status << endl;
-        cout << "=====================================" << endl;
-    }
+    void display();
 };
 
 class CustomerCollection {
@@ -630,19 +599,17 @@ public:
         int index = FindByID(id);
         if (index != -1) {
             Product p;
-            int catId, qty;
+            int catId;
             string name, desc;
             float price;
             name = getStringInput("Enter new Name: ");
             catId = getValidatedInt("Enter new Category ID: ");
             price = getValidatedFloat("Enter new Price: ");
-            qty = getValidatedInt("Enter new Quantity: ");
             desc = getStringInput("Enter new Description: ");
             p.setProductID(products[index].getProductID());
             p.setProductName(name);
             p.setCategoryID(catId);
             p.setPrice(price);
-            p.setQuantity(qty);
             p.setDescription(desc);
             products[index] = p;
             cout << "Product updated successfully!" << endl;
@@ -701,12 +668,11 @@ public:
                 headerSkipped = true;
             }
             stringstream ss(line);
-            string pidStr, name, catIdStr, priceStr, qtyStr, desc;
+            string pidStr, name, catIdStr, priceStr, desc;
             if (getline(ss, pidStr, ',') &&
                 getline(ss, name, ',') &&
                 getline(ss, catIdStr, ',') &&
                 getline(ss, priceStr, ',') &&
-                getline(ss, qtyStr, ',') &&
                 getline(ss, desc, ',')) {
                 Product p;
                 int loadedPID = stoi(pidStr);
@@ -714,7 +680,6 @@ public:
                 p.setProductName(name);
                 p.setCategoryID(stoi(catIdStr));
                 p.setPrice(stof(priceStr));
-                p.setQuantity(stoi(qtyStr));
                 p.setDescription(desc);
                 products[count] = p;
                 count++;
@@ -733,13 +698,12 @@ public:
             cerr << "Error: Could not write to " << filename << endl;
             return;
         }
-        file << "ProductID,ProductName,CategoryID,Price,Quantity,Description\n";
+        file << "ProductID,ProductName,CategoryID,Price,Description\n";
         for (int i = 0; i < count; i++) {
             file << products[i].getProductID() << ","
                 << products[i].getProductName() << ","
                 << products[i].getCategoryID() << ","
                 << products[i].getPrice() << ","
-                << products[i].getQuantity() << ","
                 << products[i].getDescription() << "\n";
         }
         file.close();
@@ -862,7 +826,7 @@ public:
                 o.setOrderID(loadedOID);
                 o.setOrderDate(date);
                 o.setCustomerID(stoi(custIdStr));
-                o.setTotalAmount(stof(totalStr));
+                o.totalAmount = stof(totalStr);
                 o.setOrderStatus(status);
                 orders[count] = o;
                 count++;
@@ -1821,48 +1785,7 @@ public:
         }
     }
 
-    void Update(int itemID) {
-        int index = FindByID(itemID);
-        if (index != -1) {
-            Inventory inv;
-            int wid, cap, iid, qty;
-            string wname, location, iname, desc;
-            double price;
-            cout << "Enter new Warehouse ID: ";
-            cin >> wid;
-            clearInputBuffer();
-            wname = getStringInput("Enter new Warehouse Name: ");
-            location = getStringInput("Enter new Location: ");
-            cout << "Enter new Capacity: ";
-            cin >> cap;
-            clearInputBuffer();
-            cout << "Enter new Item ID: ";
-            cin >> iid;
-            clearInputBuffer();
-            iname = getStringInput("Enter new Item Name: ");
-            cout << "Enter new Price: ";
-            cin >> price;
-            clearInputBuffer();
-            cout << "Enter new Quantity: ";
-            cin >> qty;
-            clearInputBuffer();
-            desc = getStringInput("Enter new Description: ");
-            inv.setID(wid);
-            inv.setName(wname);
-            inv.setLocation(location);
-            inv.setCapacity(cap);
-            inv.setItemID(iid);
-            inv.setItemName(iname);
-            inv.setPrice(price);
-            inv.setQuantity(qty);
-            inv.setDescription(desc);
-            inventoryItems[index] = inv;
-            cout << "Inventory updated successfully!" << endl;
-        }
-        else {
-            cout << "Inventory item not found!" << endl;
-        }
-    }
+    void Update(int productID);
 
     void DisplayAll() {
         if (count == 0) {
@@ -1876,17 +1799,17 @@ public:
         }
     }
 
-    int FindByID(int itemID) {
+    int FindByID(int productID) {
         for (int i = 0; i < count; i++) {
-            if (inventoryItems[i].getItemID() == itemID) {
+            if (inventoryItems[i].getProductID() == productID) {
                 return i;
             }
         }
         return -1;
     }
 
-    Inventory* GetInventory(int itemID) {
-        int index = FindByID(itemID);
+    Inventory* GetInventory(int productID) {
+        int index = FindByID(productID);
         if (index != -1) {
             return &inventoryItems[index];
         }
@@ -1924,19 +1847,10 @@ public:
             inv.setCapacity(stoi(temp));
 
             getline(ss, temp, ',');
-            inv.setItemID(stoi(temp));
-
-            getline(ss, temp, ',');
-            inv.setItemName(temp);
-
-            getline(ss, temp, ',');
-            inv.setPrice(stod(temp));
+            inv.setProductID(stoi(temp));
 
             getline(ss, temp, ',');
             inv.setQuantity(stoi(temp));
-
-            getline(ss, temp, ',');
-            inv.setDescription(temp);
 
             Add(inv);
         }
@@ -1952,18 +1866,15 @@ public:
             return;
         }
 
-        file << "WarehouseID,WarehouseName,Location,Capacity,ItemID,ItemName,Price,Quantity,Description\n";
+        file << "WarehouseID,WarehouseName,Location,Capacity,ProductID,Quantity\n";
 
         for (int i = 0; i < count; i++) {
             file << inventoryItems[i].getID() << ","
                 << inventoryItems[i].getName() << ","
                 << inventoryItems[i].getLocation() << ","
                 << inventoryItems[i].getCapacity() << ","
-                << inventoryItems[i].getItemID() << ","
-                << inventoryItems[i].getItemName() << ","
-                << inventoryItems[i].getPrice() << ","
-                << inventoryItems[i].getQuantity() << ","
-                << inventoryItems[i].getDescription() << "\n";
+                << inventoryItems[i].getProductID() << ","
+                << inventoryItems[i].getQuantity() << "\n";
         }
 
         file.close();
@@ -2005,52 +1916,7 @@ public:
         }
     }
 
-    void Update(int shipmentID) {
-        int index = FindByID(shipmentID);
-        if (index != -1) {
-            Shipment ship;
-            int sid, wid, cap, iid, qty;
-            string wname, location, iname, status;
-            double price;
-            cout << "Enter new Shipment ID: ";
-            cin >> sid;
-            clearInputBuffer();
-            cout << "Enter new Warehouse ID: ";
-            cin >> wid;
-            clearInputBuffer();
-            wname = getStringInput("Enter new Warehouse Name: ");
-            location = getStringInput("Enter new Location: ");
-            cout << "Enter new Capacity: ";
-            cin >> cap;
-            clearInputBuffer();
-            cout << "Enter new Item ID: ";
-            cin >> iid;
-            clearInputBuffer();
-            iname = getStringInput("Enter new Item Name: ");
-            cout << "Enter new Price: ";
-            cin >> price;
-            clearInputBuffer();
-            cout << "Enter new Quantity: ";
-            cin >> qty;
-            clearInputBuffer();
-            status = getStringInput("Enter new Status: ");
-            ship.setShipmentID(sid);
-            ship.setID(wid);
-            ship.setName(wname);
-            ship.setLocation(location);
-            ship.setCapacity(cap);
-            ship.setItemID(iid);
-            ship.setItemName(iname);
-            ship.setPrice(price);
-            ship.setQuantity(qty);
-            ship.setStatus(status);
-            shipments[index] = ship;
-            cout << "Shipment updated successfully!" << endl;
-        }
-        else {
-            cout << "Shipment not found!" << endl;
-        }
-    }
+    void Update(int shipmentID);
 
     void DisplayAll() {
         if (count == 0) {
@@ -2115,13 +1981,7 @@ public:
             ship.setCapacity(stoi(temp));
 
             getline(ss, temp, ',');
-            ship.setItemID(stoi(temp));
-
-            getline(ss, temp, ',');
-            ship.setItemName(temp);
-
-            getline(ss, temp, ',');
-            ship.setPrice(stod(temp));
+            ship.setProductID(stoi(temp));
 
             getline(ss, temp, ',');
             ship.setQuantity(stoi(temp));
@@ -2143,7 +2003,7 @@ public:
             return;
         }
 
-        file << "ShipmentID,WarehouseID,WarehouseName,Location,Capacity,ItemID,ItemName,Price,Quantity,Status\n";
+        file << "ShipmentID,WarehouseID,WarehouseName,Location,Capacity,ProductID,Quantity,Status\n";
 
         for (int i = 0; i < count; i++) {
             file << shipments[i].getShipmentID() << ","
@@ -2151,9 +2011,7 @@ public:
                 << shipments[i].getName() << ","
                 << shipments[i].getLocation() << ","
                 << shipments[i].getCapacity() << ","
-                << shipments[i].getItemID() << ","
-                << shipments[i].getItemName() << ","
-                << shipments[i].getPrice() << ","
+                << shipments[i].getProductID() << ","
                 << shipments[i].getQuantity() << ","
                 << shipments[i].getStatus() << "\n";
         }
@@ -2174,6 +2032,102 @@ CategoryCollection categories;
 WarehouseCollection warehouses;
 InventoryCollection inventoryItems;
 ShipmentCollection shipments;
+
+void Inventory::display() {
+    cout << "========== INVENTORY ITEM ==========" << endl;
+    displayEntity();
+    cout << "Location: " << location << endl;
+    cout << "Product ID: " << productID << endl;
+    Product* p = products.GetProduct(productID);
+    cout << "Product: " << (p ? p->getProductName() : "Unknown") << endl;
+    cout << "Price: $" << (p ? p->getPrice() : 0.0f) << endl;
+    cout << "Quantity: " << quantity << endl;
+    cout << "====================================" << endl;
+}
+
+void Shipment::display() {
+    cout << "========== SHIPMENT DETAILS ==========" << endl;
+    cout << "Shipment ID: " << shipmentID << endl;
+    displayEntity();
+    Product* p = products.GetProduct(productID);
+    cout << "Product: " << (p ? p->getProductName() : "Unknown") << endl;
+    cout << "Quantity: " << quantity << endl;
+    cout << "Status: " << status << endl;
+    cout << "=====================================" << endl;
+}
+
+void InventoryCollection::Update(int productID) {
+    int index = FindByID(productID);
+    if (index != -1) {
+        Inventory inv;
+        int wid, pid, qty;
+        cout << "Enter new Warehouse ID: ";
+        cin >> wid;
+        clearInputBuffer();
+        Warehouse* w = warehouses.GetWarehouse(wid);
+        if (w == NULL) {
+            cout << "Warehouse not found! Update cancelled.\n";
+            return;
+        }
+        cout << "Enter new Product ID: ";
+        cin >> pid;
+        clearInputBuffer();
+        cout << "Enter new Quantity: ";
+        cin >> qty;
+        clearInputBuffer();
+        inv.setID(wid);
+        inv.setName(w->getName());
+        inv.setLocation(w->getLocation());
+        inv.setCapacity(w->getCapacity());
+        inv.setProductID(pid);
+        inv.setQuantity(qty);
+        inventoryItems[index] = inv;
+        cout << "Inventory updated successfully!" << endl;
+    }
+    else {
+        cout << "Inventory item not found!" << endl;
+    }
+}
+
+void ShipmentCollection::Update(int shipmentID) {
+    int index = FindByID(shipmentID);
+    if (index != -1) {
+        Shipment ship;
+        int sid, wid, pid, qty;
+        string status;
+        cout << "Enter new Shipment ID: ";
+        cin >> sid;
+        clearInputBuffer();
+        cout << "Enter new Warehouse ID: ";
+        cin >> wid;
+        clearInputBuffer();
+        Warehouse* w = warehouses.GetWarehouse(wid);
+        if (w == NULL) {
+            cout << "Warehouse not found! Update cancelled.\n";
+            return;
+        }
+        cout << "Enter new Product ID: ";
+        cin >> pid;
+        clearInputBuffer();
+        cout << "Enter new Quantity: ";
+        cin >> qty;
+        clearInputBuffer();
+        status = getStringInput("Enter new Status: ");
+        ship.setShipmentID(sid);
+        ship.setID(wid);
+        ship.setName(w->getName());
+        ship.setLocation(w->getLocation());
+        ship.setCapacity(w->getCapacity());
+        ship.setProductID(pid);
+        ship.setQuantity(qty);
+        ship.setStatus(status);
+        shipments[index] = ship;
+        cout << "Shipment updated successfully!" << endl;
+    }
+    else {
+        cout << "Shipment not found!" << endl;
+    }
+}
 
 void customerMenu() {
     int choice;
@@ -2254,8 +2208,12 @@ void customerMenu() {
 }
 
 void productMenu() {
+    if (categories.getCount() == 0) {
+        cout << "\nCannot manage products: No categories available. Add a category first (Menu > Manage Category).\n";
+        return;
+    }
     int choice;
-    int id, catId, qty;
+    int id, catId;
     string name, desc;
     float price;
     Product p;
@@ -2277,14 +2235,16 @@ void productMenu() {
             cout << "\n--- Add Product ---\n";
             name = getStringInput("Enter Name: ");
             catId = getValidatedInt("Enter Category ID: ");
+            if (categories.FindByID(catId) == -1) {
+                cout << "Category not found! Cannot add product.\n";
+                break;
+            }
             price = getValidatedFloat("Enter Price: ");
-            qty = getValidatedInt("Enter Quantity: ");
             desc = getStringInput("Enter Description: ");
             p.setProductID(products.getNextID());
             p.setProductName(name);
             p.setCategoryID(catId);
             p.setPrice(price);
-            p.setQuantity(qty);
             p.setDescription(desc);
             cout << "Assigned Product ID: " << p.getProductID() << endl;
             cout << "\n--- Product Information ---\n";
@@ -2308,7 +2268,18 @@ void productMenu() {
                 cout << "Product not found!\n";
             }
             else {
-                products.Update(id);
+                int newCatId = getValidatedInt("Enter new Category ID: ");
+                if (categories.FindByID(newCatId) == -1) {
+                    cout << "Category not found! Update cancelled.\n";
+                }
+                else {
+                    Product* p = products.GetProduct(id);
+                    p->setCategoryID(newCatId);
+                    p->setProductName(getStringInput("Enter new Name: "));
+                    p->setPrice(getValidatedFloat("Enter new Price: "));
+                    p->setDescription(getStringInput("Enter new Description: "));
+                    cout << "Product updated successfully!" << endl;
+                }
             }
             break;
         case 4:
@@ -2335,6 +2306,10 @@ void productMenu() {
 }
 
 void orderMenu() {
+    if (customers.getCount() == 0 || products.getCount() == 0) {
+        cout << "\nCannot manage orders: Need at least one customer and one product.\n";
+        return;
+    }
     int choice;
     int id, custId, count;
     string date;
@@ -2754,10 +2729,12 @@ void warehouseMenu() {
 }
 
 void inventoryMenu() {
+    if (warehouses.getCount() == 0 || products.getCount() == 0) {
+        cout << "\nCannot manage inventory: Need at least one warehouse and one product.\n";
+        return;
+    }
     int choice;
-    int itemID, qty, wid, cap;
-    string itemName, desc, wname, location;
-    double price;
+    int productID, qty, wid;
     Inventory inv;
 
     do {
@@ -2783,53 +2760,51 @@ void inventoryMenu() {
             cout << "Enter Warehouse ID: ";
             cin >> wid;
             clearInputBuffer();
-            wname = getStringInput("Enter Warehouse Name: ");
-            location = getStringInput("Enter Location: ");
-            cout << "Enter Capacity: ";
-            cin >> cap;
-            clearInputBuffer();
-            cout << "Enter Item ID: ";
-            cin >> itemID;
-            clearInputBuffer();
-            itemName = getStringInput("Enter Item Name: ");
-            cout << "Enter Price: ";
-            cin >> price;
-            clearInputBuffer();
-            cout << "Enter Quantity: ";
-            cin >> qty;
-            clearInputBuffer();
-            desc = getStringInput("Enter Description: ");
-            inv.setID(wid);
-            inv.setName(wname);
-            inv.setLocation(location);
-            inv.setCapacity(cap);
-            inv.setItemID(itemID);
-            inv.setItemName(itemName);
-            inv.setPrice(price);
-            inv.setQuantity(qty);
-            inv.setDescription(desc);
-            cout << "\n--- Inventory Information ---\n";
-            inv.display();
-            inventoryItems.Add(inv);
+            {
+                Warehouse* w = warehouses.GetWarehouse(wid);
+                if (w == NULL) {
+                    cout << "Warehouse not found! Cannot add inventory item.\n";
+                    break;
+                }
+                cout << "Enter Product ID: ";
+                cin >> productID;
+                clearInputBuffer();
+                if (products.GetProduct(productID) == NULL) {
+                    cout << "Product not found! Cannot add inventory item.\n";
+                    break;
+                }
+                cout << "Enter Quantity: ";
+                cin >> qty;
+                clearInputBuffer();
+                inv.setID(wid);
+                inv.setName(w->getName());
+                inv.setLocation(w->getLocation());
+                inv.setCapacity(w->getCapacity());
+                inv.setProductID(productID);
+                inv.setQuantity(qty);
+                cout << "\n--- Inventory Information ---\n";
+                inv.display();
+                inventoryItems.Add(inv);
+            }
             break;
         case 2:
             cout << "\n--- Remove Inventory Item ---\n";
-            cout << "Enter Item ID to remove: ";
-            cin >> itemID;
-            inventoryItems.Remove(itemID);
+            cout << "Enter Product ID to remove: ";
+            cin >> productID;
+            inventoryItems.Remove(productID);
             break;
         case 3:
             cout << "\n--- Update Inventory Item ---\n";
-            cout << "Enter Item ID to update: ";
-            cin >> itemID;
-            inventoryItems.Update(itemID);
+            cout << "Enter Product ID to update: ";
+            cin >> productID;
+            inventoryItems.Update(productID);
             break;
         case 4:
             cout << "\n--- Search Inventory Item ---\n";
-            cout << "Enter Item ID to search: ";
-            cin >> itemID;
+            cout << "Enter Product ID to search: ";
+            cin >> productID;
             {
-                Inventory* inv = inventoryItems.GetInventory(itemID);
+                Inventory* inv = inventoryItems.GetInventory(productID);
                 if (inv != NULL) {
                     inv->display();
                 }
@@ -2851,10 +2826,13 @@ void inventoryMenu() {
 }
 
 void shipmentMenu() {
+    if (warehouses.getCount() == 0 || products.getCount() == 0) {
+        cout << "\nCannot manage shipments: Need at least one order, one warehouse, and one product.\n";
+        return;
+    }
     int choice;
-    int shipID, itemID, qty, wid, cap;
-    string itemName, status, wname, location;
-    double price;
+    int shipID, productID, qty, wid;
+    string status;
     Shipment ship;
 
     do {
@@ -2883,35 +2861,35 @@ void shipmentMenu() {
             cout << "Enter Warehouse ID: ";
             cin >> wid;
             clearInputBuffer();
-            wname = getStringInput("Enter Warehouse Name: ");
-            location = getStringInput("Enter Location: ");
-            cout << "Enter Capacity: ";
-            cin >> cap;
-            clearInputBuffer();
-            cout << "Enter Item ID: ";
-            cin >> itemID;
-            clearInputBuffer();
-            itemName = getStringInput("Enter Item Name: ");
-            cout << "Enter Price: ";
-            cin >> price;
-            clearInputBuffer();
-            cout << "Enter Quantity: ";
-            cin >> qty;
-            clearInputBuffer();
-            status = getStringInput("Enter Status: ");
-            ship.setShipmentID(shipID);
-            ship.setID(wid);
-            ship.setName(wname);
-            ship.setLocation(location);
-            ship.setCapacity(cap);
-            ship.setItemID(itemID);
-            ship.setItemName(itemName);
-            ship.setPrice(price);
-            ship.setQuantity(qty);
-            ship.setStatus(status);
-            cout << "\n--- Shipment Information ---\n";
-            ship.display();
-            shipments.Add(ship);
+            {
+                Warehouse* w = warehouses.GetWarehouse(wid);
+                if (w == NULL) {
+                    cout << "Warehouse not found! Cannot add shipment.\n";
+                    break;
+                }
+                cout << "Enter Product ID: ";
+                cin >> productID;
+                clearInputBuffer();
+                if (products.GetProduct(productID) == NULL) {
+                    cout << "Product not found! Cannot add shipment.\n";
+                    break;
+                }
+                cout << "Enter Quantity: ";
+                cin >> qty;
+                clearInputBuffer();
+                status = getStringInput("Enter Status: ");
+                ship.setShipmentID(shipID);
+                ship.setID(wid);
+                ship.setName(w->getName());
+                ship.setLocation(w->getLocation());
+                ship.setCapacity(w->getCapacity());
+                ship.setProductID(productID);
+                ship.setQuantity(qty);
+                ship.setStatus(status);
+                cout << "\n--- Shipment Information ---\n";
+                ship.display();
+                shipments.Add(ship);
+            }
             break;
         case 2:
             cout << "\n--- Remove Shipment ---\n";
@@ -2958,6 +2936,9 @@ int main() {
     customers.loadFromCSV("customers.csv");
     products.loadFromCSV("products.csv");
     orders.loadFromCSV("orders.csv");
+    employees.loadFromCSV("employees.csv");
+    suppliers.loadFromCSV("suppliers.csv");
+    categories.loadFromCSV("categories.csv");
     warehouses.loadFromCSV("warehouse.csv");
     inventoryItems.loadFromCSV("inventory.csv");
     shipments.loadFromCSV("shipment.csv");
@@ -2967,58 +2948,50 @@ int main() {
         cout << "\n========================================\n";
         cout << "  WAREHOUSE MANAGEMENT SYSTEM\n";
         cout << "========================================\n";
-        cout << "1. Manage Customer\n";
-        cout << "2. Manage Product\n";
-        cout << "3. Manage Order\n";
-        cout << "4. Manage Employee\n";
-        cout << "5. Manage Supplier\n";
-        cout << "6. Manage Category\n";
-        cout << "7. Manage Warehouse\n";
-        cout << "8. Manage Inventory\n";
-        cout << "9. Manage Shipment\n";
-        cout << "0. Exit\n";
-        choice = getValidatedMenuChoice(0, 9);
 
-        switch (choice) {
-        case 1:
-            customerMenu();
-            break;
-        case 2:
-            productMenu();
-            break;
-        case 3:
-            orderMenu();
-            break;
-        case 4:
-            employeeMenu();
-            break;
-        case 5:
-            supplierMenu();
-            break;
-        case 6:
-            categoryMenu();
-            break;
-        case 7:
-            warehouseMenu();
-            break;
-        case 8:
-            inventoryMenu();
-            break;
-        case 9:
-            shipmentMenu();
-            break;
-        case 0:
+        struct MenuItem { const char* label; void (*action)(); bool enabled; };
+        MenuItem items[] = {
+            {"Manage Customer",  customerMenu,  true},
+            {"Manage Product",   productMenu,   categories.getCount() > 0},
+            {"Manage Order",     orderMenu,     customers.getCount() > 0 && products.getCount() > 0},
+            {"Manage Employee",  employeeMenu,  true},
+            {"Manage Supplier",  supplierMenu,  true},
+            {"Manage Category",  categoryMenu,  true},
+            {"Manage Warehouse", warehouseMenu, true},
+            {"Manage Inventory", inventoryMenu, warehouses.getCount() > 0 && products.getCount() > 0},
+            {"Manage Shipment",  shipmentMenu,  orders.getCount() > 0 && warehouses.getCount() > 0 && products.getCount() > 0},
+        };
+        const int itemCount = 9;
+        int exitNum = itemCount + 1;
+
+        for (int i = 0; i < itemCount; i++) {
+            cout << i + 1 << ". " << items[i].label;
+            if (!items[i].enabled)
+                cout << "   [ADD DEPENDENCIES FIRST]";
+            cout << "\n";
+        }
+        cout << exitNum << ". Exit\n";
+        choice = getValidatedMenuChoice(1, exitNum);
+
+        if (choice == exitNum) {
             cout << "\nSaving data to CSV files...\n";
             customers.saveToCSV("customers.csv");
             products.saveToCSV("products.csv");
             orders.saveToCSV("orders.csv");
+            employees.saveToCSV("employees.csv");
+            suppliers.saveToCSV("suppliers.csv");
+            categories.saveToCSV("categories.csv");
             warehouses.saveToCSV("warehouse.csv");
             inventoryItems.saveToCSV("inventory.csv");
             shipments.saveToCSV("shipment.csv");
             cout << "Data saved successfully. Exiting program...\n";
             break;
         }
-    } while (choice != 0);
+        if (choice >= 1 && choice <= itemCount && items[choice - 1].enabled)
+            items[choice - 1].action();
+        else if (choice >= 1 && choice <= itemCount)
+            cout << "Option unavailable: add the required dependencies first.\n";
+    } while (true);
 
     return 0;
 }
